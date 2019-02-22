@@ -47,19 +47,14 @@ y_train = np.array(y_train)
 
 # print(np.shape(x_train))
 
-# Training data ******************************************************************
-l_rate  = 0.000001
-n_ite   = 100000
-x_tp    = x_train.transpose()
-w       = np.zeros(len(x_train[0]))
-loss = []
-
-for it in range(n_ite) :
-    diff = y_train - np.dot(x_train,w)
-    gra = 2.0 * np.dot(x_tp,diff) * (-1) / x_tp.shape[1]
-    w -= l_rate*gra
-    loss.append(np.sqrt(np.dot(diff,diff)/len(diff)))
+# Observe data relationship for selecting model
 
 import matplotlib.pyplot as plt
-plt.plot(loss)
+
+names   = pd.read_csv(arg_input,encoding='Big5').iloc[:18,2]
+colors  = [(i/3.1,j/3.1,k/3.1) for i in range(3) for j in range(3) for k in range(2) ]
+size    = 20
+for i in range(18) :
+    plt.scatter(x_train[i],x_train[9],s=size,color=colors[i],label=names[i])
+plt.legend()
 plt.show()
