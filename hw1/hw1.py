@@ -52,9 +52,27 @@ y_train = np.array(y_train)
 import matplotlib.pyplot as plt
 
 names   = pd.read_csv(arg_input,encoding='Big5').iloc[:18,2]
+# range : 0 <= r,g,b <= 1
 colors  = [(i/3.1,j/3.1,k/3.1) for i in range(3) for j in range(3) for k in range(2) ]
 size    = 20
+
+fig = plt.figure()
 for i in range(18) :
-    plt.scatter(x_train[i],x_train[9],s=size,color=colors[i],label=names[i])
-plt.legend()
+    f = fig.add_subplot(6,3,i+1)
+    f.scatter(x_train[i],x_train[9],s=size,color=colors[i],label=names[i])
+    ''' loc can be :
+    0 : "best"
+    1 : "upper right"
+    2 : "upper left"
+    3 : "lower left"
+    4 : "lower right"
+    5 : "right"
+    6 : "center left"
+    7 : "center right"
+    8 : "lower center"
+    9 : "upper center"
+    10: "center"    
+    ''' 
+    f.legend(loc=0)
+    f.title.set_text(names[i])
 plt.show()
