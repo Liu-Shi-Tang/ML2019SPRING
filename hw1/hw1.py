@@ -50,7 +50,7 @@ y_train = np.array(y_train)
 
 # Training data ******************************************************************
 l_rate  = 0.000001
-n_ite   = 1000
+n_ite   = 10000
 x_tp    = x_train.transpose()
 w       = np.zeros(len(x_train[0]))
 loss = []
@@ -81,4 +81,9 @@ for i in range(240) :
 
 x_test = np.array(x_test)
 # print(np.shape(x_test))
-
+y_pre = np.dot(x_test,w)
+outputFile = open(arg_output,'w+')
+outputFile.write("id,value\n")
+for i in range(len(y_pre)) :
+    outputFile.write("id_"+str(i)+","+str(y_pre[i])+"\n")
+outputFile.close()
