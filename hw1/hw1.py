@@ -4,7 +4,8 @@ import sys
 
 # Read data ***********************************************************************
 arg_input  = sys.argv[1]
-arg_output = sys.argv[2]
+arg_test   = sys.argv[2]
+arg_output = sys.argv[3]
 data_in = pd.read_csv(arg_input,encoding='Big5').iloc[:,3:]
 num_row = data_in.shape[0]
 num_col = data_in.shape[1]
@@ -49,7 +50,7 @@ y_train = np.array(y_train)
 
 # Training data ******************************************************************
 l_rate  = 0.000001
-n_ite   = 100000
+n_ite   = 1000
 x_tp    = x_train.transpose()
 w       = np.zeros(len(x_train[0]))
 loss = []
@@ -60,6 +61,24 @@ for it in range(n_ite) :
     w -= l_rate*gra
     loss.append(np.sqrt(np.dot(diff,diff)/len(diff)))
 
-import matplotlib.pyplot as plt
-plt.plot(loss)
-plt.show()
+# import matplotlib.pyplot as plt
+# plt.plot(loss)
+# plt.show()
+
+
+#  testing *********************************************************************
+test_in = pd.read_csv(arg_test,encoding='Big5',header=None).iloc[:,2:]
+x_test = []
+for i in range(240) :
+    x_test.append([])
+    for j in range(18) :
+        for k in range(9) :
+            if test_in.iloc[i*18+j,k] != 'NR' :
+                x_test[i].append(float(test_in.iloc[i*18+j,k]))
+            else :
+                x_test[i].append(float(0))
+    x_test[i].append(float(1))
+
+x_test = np.array(x_test)
+# print(np.shape(x_test))
+
