@@ -49,21 +49,25 @@ y_train = np.array(y_train)
 # print(np.shape(x_train))
 
 # Training data ******************************************************************
-l_rate  = 0.000001
-n_ite   = 10000
+l_rate  = 0.1
+n_ite   = 100000
 x_tp    = x_train.transpose()
 w       = np.zeros(len(x_train[0]))
 loss = []
+sum_gra = np.zeros(len(x_train[0]))
+
 
 for it in range(n_ite) :
     diff = y_train - np.dot(x_train,w)
     gra = 2.0 * np.dot(x_tp,diff) * (-1) / x_tp.shape[1]
-    w -= l_rate*gra
+    sum_gra += gra**2
+    w -= l_rate*gra/np.sqrt(sum_gra)
     loss.append(np.sqrt(np.dot(diff,diff)/len(diff)))
 
-# import matplotlib.pyplot as plt
-# plt.plot(loss)
-# plt.show()
+import matplotlib.pyplot as plt
+print(loss[-1])
+plt.plot(loss[200:])
+plt.show()
 
 
 #  testing *********************************************************************
