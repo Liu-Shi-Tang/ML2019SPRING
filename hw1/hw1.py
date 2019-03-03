@@ -64,10 +64,10 @@ for it in range(n_ite) :
     w -= l_rate*gra/np.sqrt(sum_gra)
     loss.append(np.sqrt(np.dot(diff,diff)/len(diff)))
 
-import matplotlib.pyplot as plt
-print(loss[-1])
-plt.plot(loss[200:])
-plt.show()
+#import matplotlib.pyplot as plt
+#print(loss[-1])
+#plt.plot(loss[200:])
+#plt.show()
 
 
 #  testing *********************************************************************
