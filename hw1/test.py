@@ -13,7 +13,7 @@ test_in = pd.read_csv(arg_test,encoding='Big5',header=None).iloc[:,2:]
 x_test = []
 for i in range(240) :
     x_test.append([])
-    for j in range(18) :
+    for j in range(9,10) :
         for k in range(9) :
             if test_in.iloc[i*18+j,k] != 'NR' :
                 x_test[i].append(float(test_in.iloc[i*18+j,k]))

@@ -32,7 +32,7 @@ for m in range(12) :
     for h in range(471) :
         x_train.append([])
         # n_f = num of feature
-        for n_f in range(18) :
+        for n_f in range(9,10) :
             # n_e = num of elements
             for n_e in range(9) :
                 x_train[m*471+h].append(data[n_f][480*m+h+n_e])
