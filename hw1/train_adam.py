@@ -48,7 +48,7 @@ y_train = np.array(y_train)
 
 # Training data ******************************************************************
 l_rate  = 0.1
-n_ite   = 100000
+n_ite   = 90000
 x_tp    = x_train.transpose()
 w       = np.zeros(len(x_train[0]))
 loss = []
