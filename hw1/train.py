@@ -47,19 +47,29 @@ y_train = np.array(y_train)
 # print(np.shape(x_train))
 
 # Training data ******************************************************************
-l_rate  = 0.1
-n_ite   = 96000
-x_tp    = x_train.transpose()
-w       = np.zeros(len(x_train[0]))
-loss = []
-sum_gra = np.zeros(len(x_train[0]))
+import matplotlib.pyplot as plt
+lamda = [0.1,0.001,0.0001,0.00001]
+lossList = []
+color = ['red','blue','green','yellow']
 
-
-for it in range(n_ite) :
-    diff = y_train - np.dot(x_train,w)
-    gra = 2.0 * np.dot(x_tp,diff) * (-1) / x_tp.shape[1]
-    sum_gra += gra**2
-    w -= l_rate*gra/np.sqrt(sum_gra)
-    loss.append(np.sqrt(np.dot(diff,diff)/len(diff)))
-
+for i in range(4) :
+  l_rate  = 0.1
+  n_ite   = 96000
+  x_tp    = x_train.transpose()
+  w       = np.zeros(len(x_train[0]))
+  loss = []
+  sum_gra = np.zeros(len(x_train[0]))
+  
+  
+  for it in range(n_ite) :
+      diff = y_train - np.dot(x_train,w)
+      gra = 2.0 * np.dot(x_tp,diff) * (-1) / x_tp.shape[1]
+      regu = np.concatenate((w[:-1],np.array([0])),axis=0)
+      gra += lamda[i]*regu
+      sum_gra += gra**2
+      w -= l_rate*gra/np.sqrt(sum_gra)
+      loss.append(np.sqrt(np.dot(diff,diff)/len(diff)))
+  plt.plot(loss[1000:],color=color[i])
+plt.savefig("regularization.png")
+plt.show()
 np.save("model/train",w)
