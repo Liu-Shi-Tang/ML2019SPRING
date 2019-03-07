@@ -29,16 +29,16 @@ y_train = []
 
 for m in range(12) :
     # 20*24 - 9 = 471
-    for h in range(471) :
+    for h in range(475) :
         x_train.append([])
         # n_f = num of feature
         for n_f in range(9,10) :
             # n_e = num of elements
-            for n_e in range(9) :
-                x_train[m*471+h].append(data[n_f][480*m+h+n_e])
+            for n_e in range(5) :
+                x_train[m*475+h].append(data[n_f][480*m+h+n_e])
         # bias
-        x_train[m*471+h].append(1)
-        y_train.append(data[9][480*m+h+9])
+        x_train[m*475+h].append(1)
+        y_train.append(data[9][480*m+h+5])
 
 x_train = np.array(x_train)
 y_train = np.array(y_train)

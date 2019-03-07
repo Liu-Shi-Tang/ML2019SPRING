@@ -14,7 +14,7 @@ x_test = []
 for i in range(240) :
     x_test.append([])
     for j in range(9,10) :
-        for k in range(9) :
+        for k in range(4,9) :
             if test_in.iloc[i*18+j,k] != 'NR' :
                 x_test[i].append(float(test_in.iloc[i*18+j,k]))
             else :
