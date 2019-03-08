@@ -47,16 +47,16 @@ y_train = np.array(y_train)
 # print(np.shape(x_train))
 
 # Training data ******************************************************************
-l_rate  = 0.1
-n_ite   = 90000
+l_rate  = 0.00001
+n_ite   = 96000
 x_tp    = x_train.transpose()
 w       = np.zeros(len(x_train[0]))
 loss = []
 
 # adam  
-beta_1 = 0.8
-beta_2 = 0.9
-epsilon = 1e-10
+beta_1 = 0.9
+beta_2 = 0.999
+epsilon = 1e-8
 mt = np.zeros(len(w))
 vt = np.zeros(len(w))
 
@@ -64,8 +64,14 @@ for it in range(n_ite) :
     diff = y_train - np.dot(x_train,w)
     gra = 2.0 * np.dot(x_tp,diff) * (-1) / x_tp.shape[1]
     mt = beta_1*mt + (1-beta_1)*gra
-    vt = beta_1*vt + (1-beta_2)*(gra**2)
-    w -= l_rate*(mt/(1-beta_1))/(np.sqrt(vt/(1-beta_2))+ epsilon)
+    vt = beta_2*vt + (1-beta_2)*(gra**2)
+    mt_h = mt/(1-beta_1**(it+1))
+    vt_h = vt/(1-beta_2**(it+1))
+    w -= l_rate*mt_h/(np.sqrt(vt_h)+epsilon) 
     loss.append(np.sqrt(np.dot(diff,diff)/len(diff)))
 
+
+import matplotlib.pyplot as plt
+plt.plot(loss[1000:])
+plt.show()
 np.save("model/train",w)
