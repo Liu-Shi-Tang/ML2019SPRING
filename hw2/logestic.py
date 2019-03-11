@@ -10,6 +10,7 @@ prediction_file = sys.argv[6]
 
 # read in parsed data for training #######################################################################
 data_in = np.genfromtxt(train_feature,delimiter = ',',skip_header=1) 
+data_in = np.concatenate((data_in,data_in**2,np.log(data_in + 1e-8)),axis=1)
 label_in = np.genfromtxt(train_label,delimiter = ',' , skip_header=1)
 # print (np.shape(data_in),np.shape(label_in))
 
@@ -27,7 +28,7 @@ lr = 0.1
 iteration = 10000
 w = np.zeros(num_fea)
 # print(len(data_in[0]))
-b = 0
+b = 0.1
 s_w = np.zeros(num_fea)
 s_b = 0.0
 
@@ -38,16 +39,41 @@ for it in range(iteration) :
   # TO-DO
   pre = mysigmoid(np.dot(data_in,w)+b)
   dif = label_in - pre
-  wg = -1 * np.dot(data_tran,dif) / num_data
-  bg = -1 * np.sum(dif) * 1 / num_data
+  wg = -1 * np.dot(data_tran,dif) 
+  bg = -1 * np.sum(dif) * 1 
   s_w += wg**2
   s_b += bg**2
   
-  w += lr*wg/np.sqrt(s_w)
-  b += lr*bg/np.sqrt(s_b)
- 
-  loss.append( -1 * (   label_in*np.log(pre) + (1-label_in)*np.log(1-pre) )    ) 
+  w -= lr*wg/np.sqrt(s_w)
+  b -= lr*bg/np.sqrt(s_b)
+
+
+  if it%100 == 0 : 
+    ercount = 0
+    for i in range(len(pre)) :
+      if label_in[i] == 1 :
+        if pre[i] < 0.5 :
+          ercount += 1
+      else :
+        if pre[i] >= 0.5 :
+          ercount +=1
+    loss.append(ercount/num_data)
+
 
 import matplotlib.pyplot as plt
-plt.plot(loss[1000:])
+plt.plot(loss)
 plt.show()
+
+
+test_data = np.genfromtxt(test_feature,delimiter = ',',skip_header=1)
+test_data = np.concatenate((test_data,test_data**2,np.log(test_data + 1e-8)),axis=1)
+print(np.shape(test_data))
+out = open(prediction_file,'w')
+y_test = ( mysigmoid(np.dot(test_data,w)+b) >= 0.5 )
+print(len(y_test))
+out.write("id,label\n")
+for i in range(len(y_test)) :
+  out.write(str(i+1) + ',' + str(int(y_test[i])) + '\n')
+out.close()
+
+
