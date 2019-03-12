@@ -49,15 +49,11 @@ for it in range(iteration) :
 
 
   if it%100 == 0 : 
-    ercount = 0
-    for i in range(len(pre)) :
-      if label_in[i] == 1 :
-        if pre[i] < 0.5 :
-          ercount += 1
-      else :
-        if pre[i] >= 0.5 :
-          ercount +=1
-    loss.append(ercount/num_data)
+    t_pre = (pre >= 0.5)
+    t_dif = (t_pre == label_in ) 
+    t_dif = t_dif.astype('int')
+    l = np.average(t_dif)
+  loss.append(l)
 
 
 import matplotlib.pyplot as plt
@@ -67,10 +63,10 @@ plt.show()
 
 test_data = np.genfromtxt(test_feature,delimiter = ',',skip_header=1)
 test_data = np.concatenate((test_data,test_data**2,np.log(test_data + 1e-8)),axis=1)
-print(np.shape(test_data))
+# print(np.shape(test_data))
 out = open(prediction_file,'w')
 y_test = ( mysigmoid(np.dot(test_data,w)+b) >= 0.5 )
-print(len(y_test))
+# print(len(y_test))
 out.write("id,label\n")
 for i in range(len(y_test)) :
   out.write(str(i+1) + ',' + str(int(y_test[i])) + '\n')
