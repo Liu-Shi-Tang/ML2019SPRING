@@ -14,6 +14,11 @@ data_in = np.concatenate((data_in,data_in**2,np.log(data_in + 1e-8)),axis=1)
 label_in = np.genfromtxt(train_label,delimiter = ',' , skip_header=1)
 # print (np.shape(data_in),np.shape(label_in))
 
+# normalize data #######################################################################################
+std = np.std(data_in,axis=0)
+mean = np.mean(data_in,axis=0)
+data_in = np.divide(np.subtract(data_in,mean),std)
+
 
 # define sigmoid function for logistic regression #######################################################
 def mysigmoid(z) :
@@ -63,6 +68,13 @@ plt.show()
 
 test_data = np.genfromtxt(test_feature,delimiter = ',',skip_header=1)
 test_data = np.concatenate((test_data,test_data**2,np.log(test_data + 1e-8)),axis=1)
+
+# normalize data #######################################################################################
+std = np.std(test_data,axis=0)
+mean = np.mean(test_data,axis=0)
+data_in = np.divide(np.subtract(test_data,mean),std)
+
+
 # print(np.shape(test_data))
 out = open(prediction_file,'w')
 y_test = ( mysigmoid(np.dot(test_data,w)+b) >= 0.5 )
