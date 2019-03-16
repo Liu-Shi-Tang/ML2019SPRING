@@ -12,7 +12,7 @@ prediction_file = sys.argv[6]
 
 # read in parsed data for training #######################################################################
 data_in = np.genfromtxt(train_feature,delimiter = ',',skip_header=1) 
-data_in = np.concatenate((data_in,data_in**2,np.log(data_in+1e-8)),axis=1)
+data_in = np.concatenate((data_in,data_in*np.log(data_in+1e-8),np.log(data_in+1e-8)),axis=1)
 label_in = np.genfromtxt(train_label,delimiter = ',' , skip_header=1)
 # print (np.shape(data_in),np.shape(label_in))
 
@@ -82,7 +82,7 @@ plt.show()
 
 
 test_data = np.genfromtxt(test_feature,delimiter = ',',skip_header=1)
-test_data = np.concatenate((test_data,test_data**2,np.log(test_data + 1e-8)),axis=1)
+test_data = np.concatenate((test_data,test_data*np.log(test_data + 1e-8),np.log(test_data + 1e-8)),axis=1)
 
 # normalize data #######################################################################################
 test_std = np.std(test_data,axis=0)
