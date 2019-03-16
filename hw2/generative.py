@@ -1,6 +1,5 @@
 import numpy as np
 import sys
-from sklearn.model_selection import train_test_split
 
 
 raw_train = sys.argv[1]
@@ -49,8 +48,8 @@ if num_of_class_low > 0 :
 
 # start to calculate sigma for same covariance
 
-print(np.transpose((class_high[0] - mean_high)).shape,type((class_high[0] - mean_high)))
-print(np.dot( np.transpose(class_low[0]  - mean_low ) , class_low[0] - mean_low  ).shape)
+# print(np.transpose((class_high[0] - mean_high)).shape,type((class_high[0] - mean_high)))
+# print(np.dot( np.transpose(class_low[0]  - mean_low ) , class_low[0] - mean_low  ).shape)
 
 
 cov_high = np.zeros((size_of_feature,size_of_feature))
@@ -64,10 +63,11 @@ for i in range(num_of_class_low) :
 
 
 cov = (cov_high*num_of_class_high + cov_low*num_of_class_low ) / (num_of_class_high + num_of_class_low)
-
-print(cov.shape,type(cov))
 cov_inv = np.linalg.inv(cov)
+# print(cov.shape,type(cov))
 
+
+# calculate w and b 
 w = np.dot(mean_high-mean_low,cov_inv)
 b = (-0.5) * np.dot(np.dot(mean_high,cov_inv) , np.transpose(mean_high) ) + 0.5 * np.dot( np.dot(mean_low,cov_inv), np.transpose(mean_low) ) + np.log(float(num_of_class_high)/num_of_class_low)
 
@@ -76,12 +76,12 @@ b = (-0.5) * np.dot(np.dot(mean_high,cov_inv) , np.transpose(mean_high) ) + 0.5 
 test_data = np.genfromtxt(test_feature,delimiter = ',',skip_header=1)
 
 
-
+# predict test data
 z = np.dot(test_data,np.transpose(w)) + b
 ans = 1 / ( 1 + np.exp(-z))
 ans = (ans >= 0.5)
 
-
+# write prediction
 out = open(prediction_file,'w')
 # print(len(y_test))
 out.write("id,label\n")
