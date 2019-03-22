@@ -80,6 +80,14 @@ plt.plot(loss_test,c='r')
 plt.plot(loss_train,c='b')
 plt.show()
 
+# find most important feature
+mf = max(w)
+i = 0
+for j in range(len(w)) :
+  if w[j] == mf :
+    i = j
+    break ;
+print(i)
 
 test_data = np.genfromtxt(test_feature,delimiter = ',',skip_header=1)
 test_data = np.concatenate((test_data,test_data*np.log(test_data + 1e-8),np.log(test_data + 1e-8)),axis=1)
