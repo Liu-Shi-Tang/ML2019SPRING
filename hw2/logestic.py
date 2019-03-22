@@ -74,7 +74,7 @@ for it in range(iteration) :
     l = np.average(t_dif)
     loss_test.append(l)
 
-
+print("train:",str(max(loss_train)),"test:",str(max(loss_test)))
 import matplotlib.pyplot as plt
 plt.plot(loss_test,c='r')
 plt.plot(loss_train,c='b')
