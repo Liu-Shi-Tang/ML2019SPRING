@@ -14,6 +14,15 @@ data_in = np.genfromtxt(train_feature,delimiter = ',',skip_header=1)
 label_in = np.genfromtxt(train_label,delimiter = ',' , skip_header=1)
 # print (np.shape(data_in),np.shape(label_in))
 
+
+
+# normalize data #######################################################################################
+std = np.std(data_in,axis=0)
+mean = np.mean(data_in,axis=0)
+data_in = np.divide(np.subtract(data_in,mean),std)
+
+
+
 # Find Mu for two class ####################################################################################
 
 size_of_feature = len(data_in[0])
@@ -74,6 +83,11 @@ b = (-0.5) * np.dot(np.dot(mean_high,cov_inv) , np.transpose(mean_high) ) + 0.5 
 
 # read testing data
 test_data = np.genfromtxt(test_feature,delimiter = ',',skip_header=1)
+
+
+# normalize data #######################################################################################
+test_data = np.divide(np.subtract(test_data,mean),std)
+
 
 
 # predict test data
