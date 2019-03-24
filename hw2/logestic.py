@@ -42,8 +42,8 @@ b = 0.1
 s_w = np.zeros(num_fea)
 s_b = 0.0
 
-loss_test = []
-loss_train = []
+acc_test = []
+acc_train = []
 
 lamda = 0
 
@@ -65,19 +65,19 @@ for it in range(iteration) :
     t_dif = (t_pre == label_in ) 
     t_dif = t_dif.astype('int')
     l = np.average(t_dif)
-    loss_train.append(l)
+    acc_train.append(l)
 
     pre = mysigmoid(np.dot(test_x,w)+b)
     t_pre = (pre >= 0.5)
     t_dif = (t_pre == test_y ) 
     t_dif = t_dif.astype('int')
     l = np.average(t_dif)
-    loss_test.append(l)
+    acc_test.append(l)
 
-print("train:",str(max(loss_train)),"test:",str(max(loss_test)))
+print("train:",str(max(acc_train)),"test:",str(max(acc_test)))
 import matplotlib.pyplot as plt
-plt.plot(loss_test,c='r')
-plt.plot(loss_train,c='b')
+plt.plot(acc_test,c='r')
+plt.plot(acc_train,c='b')
 plt.show()
 
 # find most important feature
