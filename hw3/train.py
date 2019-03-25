@@ -11,11 +11,7 @@ from keras.optimizers import SGD, Adam
 from keras.utils import np_utils
 from keras.preprocessing.image import ImageDataGenerator
 from keras.layers.normalization import BatchNormalization
-
-# For GPU Limitation
-import os
-import tensorflow as tf
-import keras.backend.tensorflow_backend as KTF
+from keras.layers.advanced_activations import LeakyReLU
 
 # input argument
 train_file = sys.argv[1]
@@ -44,38 +40,82 @@ label = np_utils.to_categorical(label,7)
 
 # reshaping for convolution
 feature = np.reshape(feature,(num_train,48,48,1))
+
+# np.save('train_X.npy', feature)
+# sys.exit(0)
+
 feature = feature.astype(float)
 feature = feature/255
+
+
+# split data
+valid_feature = feature[:2000]
+valid_label = label[:2000]
+train_feature = feature[2000:]
+train_label = label[2000:]
 
 
 # build model
 print("Start to build model")
 model = Sequential()
 
-model.add(Conv2D(32,(3,3),input_shape = (48,48,1) ,activation = 'relu'))
-model.add(Conv2D(32,(3,3), activation = 'relu'))
-model.add(MaxPooling2D((2,2)))
+model.add(Conv2D(64,(5,5),input_shape = (48,48,1), activation = 'relu'))
 model.add(Conv2D(64,(3,3), activation = 'relu'))
 model.add(Conv2D(64,(3,3), activation = 'relu'))
+model.add(Conv2D(64,(3,3), activation = 'relu'))
 model.add(MaxPooling2D((2,2)))
-model.add(Conv2D(128,(3,3), activation = 'relu'))
-model.add(Conv2D(128,(3,3), activation = 'relu'))
-model.add(MaxPooling2D((2,2)))
+model.add(Dropout(0.25)) 
 
+model.add(Conv2D(128,(3,3), activation = 'relu'))
+model.add(Conv2D(128,(3,3), activation = 'relu'))
+model.add(MaxPooling2D((2,2)))
+model.add(Dropout(0.3))
+
+model.add(Conv2D(256,(3,3), activation = 'relu'))
+model.add(Conv2D(256,(3,3), activation = 'relu'))
+model.add(MaxPooling2D((2,2)))
+model.add(Dropout(0.35))
 
 model.add(Flatten())
 
 
+model.add(Dense(1024))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(Dropout(0.5)) 
+
+
+  
+model.add(Dense(1024))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(Dropout(0.5)) 
+
+
+
+model.add(Dense(512))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(Dropout(0.5)) 
 
 model.add(Dense(256))
-model.add(Activation('relu'))
-model.add(Dense(256))
+model.add(BatchNormalization())
 model.add(Activation('relu'))
 
 model.add(Dense(units=7,activation='softmax'))
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
-model.fit(feature,label,batch_size=100,epochs=10)
+datagen = ImageDataGenerator(
+    rotation_range=15,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    horizontal_flip=True)
 
+datagen.fit(train_feature)
+model.fit_generator(datagen.flow(train_feature,train_label,batch_size=128),steps_per_epoch=len(feature)/4,epochs=40)
+# model.fit(feature,label,batch_size=10,epochs=50)
+score = model.evaluate(valid_feature,valid_label)
+print('Total loss on testing set : ',score[0])
+print('accuracy of testing set : ',score[1])
 print('done')
 
 
