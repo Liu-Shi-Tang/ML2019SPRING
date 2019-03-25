@@ -61,8 +61,6 @@ model = Sequential()
 
 model.add(Conv2D(64,(5,5),input_shape = (48,48,1), activation = 'relu'))
 model.add(Conv2D(64,(3,3), activation = 'relu'))
-model.add(Conv2D(64,(3,3), activation = 'relu'))
-model.add(Conv2D(64,(3,3), activation = 'relu'))
 model.add(MaxPooling2D((2,2)))
 model.add(Dropout(0.25)) 
 
@@ -111,7 +109,7 @@ datagen = ImageDataGenerator(
     horizontal_flip=True)
 
 datagen.fit(train_feature)
-model.fit_generator(datagen.flow(train_feature,train_label,batch_size=128),steps_per_epoch=len(feature)/4,epochs=40)
+model.fit_generator(datagen.flow(train_feature,train_label,batch_size=128),steps_per_epoch=len(feature)/4,epochs=50)
 # model.fit(feature,label,batch_size=10,epochs=50)
 score = model.evaluate(valid_feature,valid_label)
 print('Total loss on testing set : ',score[0])
