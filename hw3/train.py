@@ -1,5 +1,6 @@
 import numpy as np
 import sys
+import keras
 # For NN
 from keras.models import Sequential
 # For fully connection, dropout, and activation
@@ -60,56 +61,75 @@ print("Start to build model")
 model = Sequential()
 
 model.add(Conv2D(64,(5,5),input_shape = (48,48,1), activation = 'relu'))
-model.add(Conv2D(64,(3,3), activation = 'relu'))
+model.add(BatchNormalization())
 model.add(MaxPooling2D((2,2)))
 model.add(Dropout(0.25)) 
 
 model.add(Conv2D(128,(3,3), activation = 'relu'))
-model.add(Conv2D(128,(3,3), activation = 'relu'))
+model.add(BatchNormalization())
 model.add(MaxPooling2D((2,2)))
 model.add(Dropout(0.3))
 
 model.add(Conv2D(256,(3,3), activation = 'relu'))
-model.add(Conv2D(256,(3,3), activation = 'relu'))
+model.add(BatchNormalization())
 model.add(MaxPooling2D((2,2)))
 model.add(Dropout(0.35))
+
+model.add(Conv2D(512,(3,3), activation = 'relu'))
+model.add(BatchNormalization())
+model.add(MaxPooling2D((2,2)))
+model.add(Dropout(0.4))
+
 
 model.add(Flatten())
 
 
-model.add(Dense(1024))
-model.add(BatchNormalization())
+model.add(Dense(512))
 model.add(Activation('relu'))
-model.add(Dropout(0.5)) 
-
-
-  
-model.add(Dense(1024))
 model.add(BatchNormalization())
-model.add(Activation('relu'))
 model.add(Dropout(0.5)) 
-
-
 
 model.add(Dense(512))
-model.add(BatchNormalization())
 model.add(Activation('relu'))
+model.add(BatchNormalization())
 model.add(Dropout(0.5)) 
 
-model.add(Dense(256))
-model.add(BatchNormalization())
-model.add(Activation('relu'))
+
 
 model.add(Dense(units=7,activation='softmax'))
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
 datagen = ImageDataGenerator(
-    rotation_range=15,
+    rotation_range=30,
     width_shift_range=0.2,
     height_shift_range=0.2,
+    zoom_range=[0.8,1.2],
+    shear_range=0.2,
     horizontal_flip=True)
 
-datagen.fit(train_feature)
-model.fit_generator(datagen.flow(train_feature,train_label,batch_size=128),steps_per_epoch=len(feature)/4,epochs=50)
+model.summary()
+
+
+mcp = keras.callbacks.ModelCheckpoint('mcp.h5',
+    monitor='val_loss',
+    save_best_only=True,
+    verbose=1,
+    mode='auto',
+    period=1)
+
+es = keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
+    factor=0.1,
+    patience=10,
+    verbose=1,
+    mode='auto',
+    min_delta=0.000001,
+    min_lr=0.0001)
+
+# datagen.fit(train_feature)
+model.fit_generator(datagen.flow(train_feature,train_label,batch_size=128),
+    steps_per_epoch=len(feature)/4,
+    epochs=500,
+    validation_data=(valid_feature,valid_label),
+    callbacks=[mcp,es])
 # model.fit(feature,label,batch_size=10,epochs=50)
 score = model.evaluate(valid_feature,valid_label)
 print('Total loss on testing set : ',score[0])
