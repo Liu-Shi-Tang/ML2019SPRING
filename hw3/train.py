@@ -160,5 +160,7 @@ for i in range(len(result)) :
   f.write(str(i) + ',' + str(int(np.argmax(result[i]))) + '\n')
 
 f.close()
+model.save('m.h5')
+  
 print('end')
 
