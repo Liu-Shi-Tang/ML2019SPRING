@@ -109,7 +109,7 @@ datagen = ImageDataGenerator(
 model.summary()
 
 
-mcp = keras.callbacks.ModelCheckpoint('mcp.h5',
+mcp = keras.callbacks.ModelCheckpoint('mcp-acc-{val_acc:.5f}.h5',
     monitor='val_loss',
     save_best_only=True,
     verbose=1,
