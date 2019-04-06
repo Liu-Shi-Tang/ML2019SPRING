@@ -29,7 +29,7 @@ def parsingTrainingData ( file_name ) :
  
  
   # reshaping for convolution
-  feature = np.reshape(feature,(num_train,48,48,1))
+  feature = np.reshape(feature,(num_train,1,48,48)) # different from keras
   
   # np.save('train_X.npy', feature)
   # sys.exit(0)
@@ -44,6 +44,11 @@ def parsingTrainingData ( file_name ) :
   train_feature = feature[2000:]
   train_label = label[2000:]
 
+  # Transform to tensor data
+  valid_feature = torch.FloatTensor(valid_feature)
+  train_feature = torch.FloatTensor(train_feature)
+  valid_label   = torch.LongTensor(valid_label)
+  train_label   = torch.LongTensor(train_label)
   return train_feature , train_label , valid_feature , valid_label
 
 
@@ -59,9 +64,12 @@ def readTestingData( file_name ) :
   
   
   # reshaping testing data
-  test_in = np.reshape(test_in,(num_test,48,48,1))
+  test_in = np.reshape(test_in,(num_test,1,48,48)) # different from keras
   test_in = test_in.astype(float)
   test_in = test_in/255
+ 
+  # Transform to tensor data 
+  test_in = torch.FloatTensor(test_in)
 
   return test_in
 
@@ -80,8 +88,46 @@ def writeResult(result,file_name='default.csv') :
 class CNN01 (nn.Module):
   def __init__ (self) :
     super(CNN01,self).__init__()
-    
+    self.cnn = nn.Sequential(
+        nn.Conv2d(1,64,5,1,2),
+        nn.BatchNorm2d(64),
+        nn.LeakyReLU(0.2),
+        nn.Conv2d(64,64,3,1,1),
+        nn.BatchNorm2d(64),
+        nn.LeakyReLU(0.2),
+        nn.MaxPoolsd(2,2,0),
 
+        nn.Conv2d(64,128,3,1,1),
+        nn.BatchNorm2d(128),
+        nn.LeakyReLU(0.2),
+        nn.Conv2d(128,128,3,1,1),
+        nn.BatchNorm2d(128),
+        nn.LeakyReLU(0.2),
+        nn.MaxPoolsd(2,2,0),
+
+        nn.Conv2d(128,256,3,1,1),
+        nn.BatchNorm2d(256),
+        nn.LeakyReLU(0.2),
+        nn.Conv2d(256,256,3,1,1),
+        nn.BatchNorm2d(256),
+        nn.LeakyReLU(0.2),
+        nn.MaxPoolsd(2,2,0),
+        )
+
+    self.fc = nn.Sequential(
+        nn.Linear(256*6*6,1024),
+        nn.LeakyReLU(0.2),
+        nn.Dropout(p=0.5),
+        nn.Linear(1024,512),
+        nn.LeakyReLU(0.2),
+        nn.Dropout(0.5),
+        nn.Softmax()
+        )
+
+  def forward(self,x) :
+    out = self.cnn(x)
+    out = out.view(out.size()[0],-1) # flatten
+    return self.fc(out)
 
 # arg
 training_data_file = sys[1]
@@ -92,5 +138,51 @@ testing_data_file = sys[2]
 train_feature , train_label , valid_feature , valid_label = parsingTrainingData(training_data_file)
 
 
+# convert to TensorDataSet
+train_set = TensorDataset(train_feature,train_label)
+val_set   = TensorDataset(valid_feature,valid_label)
 
+# define parameters
+BATCH_SIZE = 256
+LEARNING_RATE = 0.01
+EPOCHES = 20
+
+# convert to DataLoader
+train_loader = DataLoader(train_set,batch_size=BATCH_SIZE,shuffle=False,num_worker=8)
+val_loader   = DataLoader(val_set,batch_size=BATCH_SIZE,shuffle=False,num_worker=8)
+
+# training
+model = CNN01().cuda()
+
+# print model
+print(model)
+
+loss_fun = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(model.parameters(),lr=LEARNING_RATE)
+best_acc = 0.0
+
+for epoch in range(EPOCHES) :
+  epoch_start_time = time.time()
+  train_acc = 0.0
+  train_loss= 0.0
+  val_acc   = 0.0
+  val_loss  = 0.0
+
+  # start for training
+  model.train()
+  for i,data in enumerate(train_loader) :
+    optimizer.zero_grad()
+
+    train_pre = model(data[0].cuda())
+    batch_loss= loss_fun(train_pre,data[1].cuda())
+    batch_loss.backward()
+    optimizer.step()
+
+    train_acc += np.sum
+
+
+
+
+
+ 
 
