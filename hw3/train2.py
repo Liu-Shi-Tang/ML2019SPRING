@@ -88,20 +88,27 @@ train_file = sys.argv[1]
 train_feature,train_label,valid_feature,valid_label = parsingTrainingData(train_file)
 
 # build model #####################################################################################
+
+  
+# First define my initializer
+def myInit( shape , dtype=None) :
+  return keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)
+
+  
 print("Start to build model")
 model = Sequential()
 
-model.add(Conv2D(64,(5,5),input_shape = (48,48,1), activation = 'relu', padding='same',kernel_initializer='glorot_normal'))
+model.add(Conv2D(64,(5,5),input_shape = (48,48,1), activation = 'relu', padding='same',kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
 model.add(BatchNormalization())
 model.add(MaxPooling2D((2,2)))
 model.add(Dropout(0.25)) 
 
-model.add(Conv2D(128,(3,3), activation = 'relu', padding='same',kernel_initializer='glorot_normal'))
+model.add(Conv2D(128,(5,5), activation = 'relu', padding='same',kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
 model.add(BatchNormalization())
 model.add(MaxPooling2D((2,2)))
 model.add(Dropout(0.3))
 
-model.add(Conv2D(256,(3,3), activation = 'relu', padding='same',kernel_initializer='glorot_normal'))
+model.add(Conv2D(256,(3,3), activation = 'relu', padding='same',kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
 model.add(BatchNormalization())
 model.add(MaxPooling2D((2,2)))
 model.add(Dropout(0.35))
@@ -115,12 +122,12 @@ model.add(Dropout(0.4))
 model.add(Flatten())
 
 
-model.add(Dense(512,kernel_initializer='glorot_normal'))
+model.add(Dense(1024,kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
 model.add(Activation('relu'))
 model.add(BatchNormalization())
 model.add(Dropout(0.5)) 
 
-model.add(Dense(512,kernel_initializer='glorot_normal'))
+model.add(Dense(512,kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
 model.add(Activation('relu'))
 model.add(BatchNormalization())
 model.add(Dropout(0.5)) 
@@ -140,7 +147,7 @@ datagen = ImageDataGenerator(
 model.summary()
 
 
-mcp = keras.callbacks.ModelCheckpoint('mcp-20190406-1-acc-{val_acc:.5f}.h5',
+mcp = keras.callbacks.ModelCheckpoint('mcp-20190407-3-acc-{val_acc:.5f}.h5',
     monitor='val_acc',
     save_best_only=True,
     verbose=1,
@@ -157,8 +164,8 @@ es = keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
 
 # datagen.fit(train_feature)
 model.fit_generator(datagen.flow(train_feature,train_label,batch_size=128),
-    steps_per_epoch=len(train_feature)/4,
-    epochs=50,
+    steps_per_epoch=len(train_feature)/16+1,
+    epochs=200,
     validation_data=(valid_feature,valid_label),
     callbacks=[mcp,es])
 # model.fit(feature,label,batch_size=10,epochs=50)
