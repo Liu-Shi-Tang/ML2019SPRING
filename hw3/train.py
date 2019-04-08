@@ -140,7 +140,7 @@ datagen = ImageDataGenerator(
 model.summary()
 
 
-mcp = keras.callbacks.ModelCheckpoint('mcp-20190406-1-acc-{val_acc:.5f}.h5',
+mcp = keras.callbacks.ModelCheckpoint('mcp-best-acc-{val_acc:.5f}.h5',
     monitor='val_acc',
     save_best_only=True,
     verbose=1,
@@ -158,7 +158,7 @@ es = keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
 # datagen.fit(train_feature)
 model.fit_generator(datagen.flow(train_feature,train_label,batch_size=128),
     steps_per_epoch=len(train_feature)/4,
-    epochs=50,
+    epochs=35,
     validation_data=(valid_feature,valid_label),
     callbacks=[mcp,es])
 # model.fit(feature,label,batch_size=10,epochs=50)
@@ -169,19 +169,28 @@ print('done')
 
 
 # read testing data #######################################################################
-test_file = sys.argv[2] 
-test_in = parsingTestingData(test_file)
+#test_file = sys.argv[2] 
+#test_in = parsingTestingData(test_file)
 
 # predict for testing data ################################################################
-result = model.predict(test_in)
+#result = model.predict(test_in)
 
 
 # write result ###########################################################################
-writeResult('default.csv',result)
+#writeResult('default.csv',result)
 
 
-# save model
-model.save('m.h5')
   
-print('end')
+# save model
+model.save('best_m.h5')
+ 
+# save history of acc loss
+np_val_acc = np.array(history.history['val_acc'])
+np_tra_acc = np.array(history.history['acc'])
+np_val_loss = np.array(history.history['val_loss'])
+np_tra_loss = np.array(history.history['loss'])
+np.save('best_val_loss',np_val_loss)
+np.save('best_tra_loss',np_tra_loss)
+np.save('best_val_acc',np_val_acc)
+np.save('best_tra_acc',np_tra_acc)
 

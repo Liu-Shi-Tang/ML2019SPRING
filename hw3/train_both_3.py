@@ -177,7 +177,7 @@ es = keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
 history = model.fit_generator(
     datagen.flow(train_feature,train_label,batch_size=128),
     steps_per_epoch=len(train_feature)/32,
-    epochs=30,
+    epochs=50,
     validation_data=(valid_feature,valid_label),
     callbacks=[mcp,es])
 # model.fit(feature,label,batch_size=10,epochs=50)
