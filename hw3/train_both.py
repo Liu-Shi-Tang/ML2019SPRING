@@ -55,6 +55,7 @@ def parsingTrainingData(file_name) :
   mean , std = np.mean(train_feature,axis=0) , np.std(train_feature,axis=0)
 
   train_feature = (train_feature - mean) / (std +1e-20) 
+  valid_feature = (valid_feature - mean) / (std + 1e-20)   
   
   np.save('both_mean',mean)
   np.save('both_std',std)
@@ -108,25 +109,25 @@ def myInit( shape , dtype=None) :
 print("Start to build model")
 model = Sequential()
 
-model.add(Conv2D(64,(5,5),input_shape = (48,48,1), activation = 'relu', padding='same',kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
+model.add(Conv2D(512,(5,5),input_shape = (48,48,1), activation = 'relu', padding='same',kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
 model.add(BatchNormalization())
 model.add(MaxPooling2D((2,2)))
 model.add(Dropout(0.25)) 
 
-model.add(Conv2D(128,(5,5), activation = 'relu', padding='same',kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
+model.add(Conv2D(256,(5,5), activation = 'relu', padding='same',kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
 model.add(BatchNormalization())
 model.add(MaxPooling2D((2,2)))
 model.add(Dropout(0.3))
 
-model.add(Conv2D(256,(3,3), activation = 'relu', padding='same',kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
+model.add(Conv2D(128,(3,3), activation = 'relu', padding='same',kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
 model.add(BatchNormalization())
 model.add(MaxPooling2D((2,2)))
 model.add(Dropout(0.35))
 
-model.add(Conv2D(512,(3,3), activation = 'relu', padding='same',kernel_initializer='glorot_normal'))
-model.add(BatchNormalization())
-model.add(MaxPooling2D((2,2)))
-model.add(Dropout(0.4))
+# model.add(Conv2D(512,(3,3), activation = 'relu', padding='same',kernel_initializer='glorot_normal'))
+# model.add(BatchNormalization())
+# model.add(MaxPooling2D((2,2)))
+# model.add(Dropout(0.4))
 
 
 model.add(Flatten())
