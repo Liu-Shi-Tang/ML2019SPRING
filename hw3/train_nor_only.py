@@ -177,7 +177,7 @@ history = model.fit(
     x=train_feature,
     y=train_label,
     batch_size=128,
-    epochs=250,
+    epochs=30,
     validation_data=(valid_feature,valid_label),
     callbacks=[mcp,es])
 # model.fit(feature,label,batch_size=10,epochs=50)
@@ -188,15 +188,15 @@ print('done')
 
 
 # read testing data #######################################################################
-test_file = sys.argv[2] 
-test_in = parsingTestingData(test_file,mean,std)
+#test_file = sys.argv[2] 
+#test_in = parsingTestingData(test_file,mean,std)
 
 # predict for testing data ################################################################
-result = model.predict(test_in)
+#result = model.predict(test_in)
 
 
 # write result ###########################################################################
-writeResult('nor_only.csv',result)
+#writeResult('nor_only.csv',result)
 
 
 # save model
