@@ -173,7 +173,7 @@ es = keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
     min_lr=0.0001)
 
 # datagen.fit(train_feature)
-history = model.fit_generator(
+history = model.fit(
     x=train_feature,
     y=train_label,
     batch_size=128,
