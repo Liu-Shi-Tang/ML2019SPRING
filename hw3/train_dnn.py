@@ -57,8 +57,8 @@ def parsingTrainingData(file_name) :
   train_feature = (train_feature - mean) / (std +1e-20) 
   valid_feature = (valid_feature - mean) / (std + 1e-20)   
   
-  np.save('both_2_mean',mean)
-  np.save('both_2_std',std)
+  np.save('dnn_mean',mean)
+  np.save('dnn_std',std)
 
   return train_feature,train_label,valid_feature,valid_label,mean,std
 
@@ -97,7 +97,8 @@ def writeResult(file_name,result) :
 # read training data #############################################################################
 train_file = sys.argv[1]
 train_feature,train_label,valid_feature,valid_label,mean,std = parsingTrainingData(train_file)
-
+train_feature = np.reshape(train_feature,(len(train_feature),48*48))
+valid_feature = np.reshape(valid_feature,(len(valid_feature),48*48))
 # build model #####################################################################################
 
   
@@ -109,29 +110,20 @@ def myInit( shape , dtype=None) :
 print("Start to build model")
 model = Sequential()
 
-model.add(Conv2D(512,(5,5),input_shape = (48,48,1), activation = 'relu', padding='same',kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
+model.add(Dense(512,input_shape=(48*48,),kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
+model.add(Activation('relu'))
 model.add(BatchNormalization())
-model.add(MaxPooling2D((2,2)))
-model.add(Dropout(0.25)) 
+model.add(Dropout(0.5)) 
 
-model.add(Conv2D(512,(5,5), activation = 'relu', padding='same',kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
+model.add(Dense(512,kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
+model.add(Activation('relu'))
 model.add(BatchNormalization())
-model.add(MaxPooling2D((2,2)))
-model.add(Dropout(0.3))
+model.add(Dropout(0.5)) 
 
-model.add(Conv2D(768,(3,3), activation = 'relu', padding='same',kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
+model.add(Dense(512,kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
+model.add(Activation('relu'))
 model.add(BatchNormalization())
-model.add(MaxPooling2D((2,2)))
-model.add(Dropout(0.35))
-
-model.add(Conv2D(128,(3,3), activation = 'relu', padding='same',kernel_initializer='glorot_normal'))
-model.add(BatchNormalization())
-model.add(MaxPooling2D((2,2)))
-model.add(Dropout(0.4))
-
-
-model.add(Flatten())
-
+model.add(Dropout(0.5)) 
 
 model.add(Dense(512,kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
 model.add(Activation('relu'))
@@ -147,18 +139,10 @@ model.add(Dropout(0.5))
 
 model.add(Dense(units=7,activation='softmax'))
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
-datagen = ImageDataGenerator(
-    rotation_range=30,
-    width_shift_range=0.2,
-    height_shift_range=0.2,
-    zoom_range=[0.8,1.2],
-    shear_range=0.2,
-    horizontal_flip=True)
-
 model.summary()
 
 
-mcp = keras.callbacks.ModelCheckpoint('mcp-both-2-acc-{val_acc:.5f}.h5',
+mcp = keras.callbacks.ModelCheckpoint('mcp-dnn-acc-{val_acc:.5f}.h5',
     monitor='val_acc',
     save_best_only=True,
     verbose=1,
@@ -174,9 +158,10 @@ es = keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
     min_lr=0.0001)
 
 # datagen.fit(train_feature)
-history = model.fit_generator(
-    datagen.flow(train_feature,train_label,batch_size=128),
-    steps_per_epoch=len(train_feature)/128,
+history = model.fit(
+    x=train_feature,
+    y=train_label,
+    batch_size = 128,
     epochs=250,
     validation_data=(valid_feature,valid_label),
     callbacks=[mcp,es])
@@ -190,26 +175,26 @@ print('done')
 # read testing data #######################################################################
 test_file = sys.argv[2] 
 test_in = parsingTestingData(test_file,mean,std)
-
+test_in = np.reshape(test_in,(len(test_in),48*48))
 # predict for testing data ################################################################
 result = model.predict(test_in)
 
 
 # write result ###########################################################################
-writeResult('both_2.csv',result)
+writeResult('dnn.csv',result)
 
 
 # save model
-model.save('both_2_m.h5')
+model.save('dnn_m.h5')
  
 # save history of acc loss
 np_val_acc = np.array(history.history['val_acc'])
 np_tra_acc = np.array(history.history['acc'])
 np_val_loss = np.array(history.history['val_loss'])
 np_tra_loss = np.array(history.history['loss'])
-np.save('both_2_val_loss',np_val_loss)
-np.save('both_2_tra_loss',np_tra_loss)
-np.save('both_2_val_acc',np_val_acc)
-np.save('both_2_tra_acc',np_tra_acc)
+np.save('dnn_val_loss',np_val_loss)
+np.save('dnn_tra_loss',np_tra_loss)
+np.save('dnn_val_acc',np_val_acc)
+np.save('dnn_tra_acc',np_tra_acc)
 print('end')
 
