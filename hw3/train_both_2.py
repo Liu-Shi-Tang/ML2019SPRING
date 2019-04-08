@@ -44,20 +44,28 @@ def parsingTrainingData(file_name) :
   # sys.exit(0)
   
   feature = feature.astype(float)
-  #feature = feature/255
-  
+  feature = feature/255
   
   # split data
   valid_feature = feature[:2000]
   valid_label = label[:2000]
   train_feature = feature[2000:]
   train_label = label[2000:]
-  return train_feature,train_label,valid_feature,valid_label
+ 
+  mean , std = np.mean(train_feature,axis=0) , np.std(train_feature,axis=0)
+
+  train_feature = (train_feature - mean) / (std +1e-20) 
+  valid_feature = (valid_feature - mean) / (std + 1e-20)   
+  
+  np.save('both_2_mean',mean)
+  np.save('both_2_std',std)
+
+  return train_feature,train_label,valid_feature,valid_label,mean,std
 
 
 
 # parsing testing data ###############################################################################
-def parsingTestingData(file_name) :
+def parsingTestingData(file_name,mean,std) :
   test_in = np.genfromtxt(fname=file_name,skip_header=1,dtype=str,delimiter=' ')
   num_test = len(test_in)
   
@@ -68,7 +76,10 @@ def parsingTestingData(file_name) :
   # reshaping testing data
   test_in = np.reshape(test_in,(num_test,48,48,1))
   test_in = test_in.astype(float)
-  # test_in = test_in/255
+  test_in = test_in/255
+
+  test_in = (test_in - mean ) / (std + 1e-20)
+
 
   return test_in
 
@@ -85,7 +96,7 @@ def writeResult(file_name,result) :
 
 # read training data #############################################################################
 train_file = sys.argv[1]
-train_feature,train_label,valid_feature,valid_label = parsingTrainingData(train_file)
+train_feature,train_label,valid_feature,valid_label,mean,std = parsingTrainingData(train_file)
 
 # build model #####################################################################################
 
@@ -113,7 +124,7 @@ model.add(BatchNormalization())
 model.add(MaxPooling2D((2,2)))
 model.add(Dropout(0.35))
 
-model.add(Conv2D(512,(3,3), activation = 'relu', padding='same',kernel_initializer='glorot_normal'))
+model.add(Conv2D(128,(3,3), activation = 'relu', padding='same',kernel_initializer='glorot_normal'))
 model.add(BatchNormalization())
 model.add(MaxPooling2D((2,2)))
 model.add(Dropout(0.4))
@@ -136,18 +147,18 @@ model.add(Dropout(0.5))
 
 model.add(Dense(units=7,activation='softmax'))
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
-# datagen = ImageDataGenerator(
-#     rotation_range=30,
-#     width_shift_range=0.2,
-#     height_shift_range=0.2,
-#     zoom_range=[0.8,1.2],
-#     shear_range=0.2,
-#     horizontal_flip=True)
+datagen = ImageDataGenerator(
+    rotation_range=30,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    zoom_range=[0.8,1.2],
+    shear_range=0.2,
+    horizontal_flip=True)
 
 model.summary()
 
 
-mcp = keras.callbacks.ModelCheckpoint('mcp-no-all-acc-{val_acc:.5f}.h5',
+mcp = keras.callbacks.ModelCheckpoint('mcp-both-2-acc-{val_acc:.5f}.h5',
     monitor='val_acc',
     save_best_only=True,
     verbose=1,
@@ -163,10 +174,9 @@ es = keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
     min_lr=0.0001)
 
 # datagen.fit(train_feature)
-history = model.fit(
-    x=train_feature,
-    y=train_label,
-    batch_size=128,
+history = model.fit_generator(
+    datagen.flow(train_feature,train_label,batch_size=128),
+    steps_per_epoch=len(train_feature)/128,
     epochs=200,
     validation_data=(valid_feature,valid_label),
     callbacks=[mcp,es])
@@ -179,27 +189,27 @@ print('done')
 
 # read testing data #######################################################################
 test_file = sys.argv[2] 
-test_in = parsingTestingData(test_file)
+test_in = parsingTestingData(test_file,mean,std)
 
 # predict for testing data ################################################################
 result = model.predict(test_in)
 
 
 # write result ###########################################################################
-writeResult('no_all.csv',result)
+writeResult('both_2.csv',result)
 
 
 # save model
-model.save('no_all_m.h5')
+model.save('both_2_m.h5')
  
 # save history of acc loss
 np_val_acc = np.array(history.history['val_acc'])
 np_tra_acc = np.array(history.history['acc'])
 np_val_loss = np.array(history.history['val_loss'])
 np_tra_loss = np.array(history.history['loss'])
-np.save('no_all_val_loss',np_val_loss)
-np.save('no_all_tra_loss',np_tra_loss)
-np.save('no_all_val_acc',np_val_acc)
-np.save('no_all_tra_acc',np_tra_acc)
+np.save('both_2_val_loss',np_val_loss)
+np.save('both_2_tra_loss',np_tra_loss)
+np.save('both_2_val_acc',np_val_acc)
+np.save('both_2_tra_acc',np_tra_acc)
 print('end')
 

@@ -114,26 +114,26 @@ model.add(BatchNormalization())
 model.add(MaxPooling2D((2,2)))
 model.add(Dropout(0.25)) 
 
-model.add(Conv2D(256,(5,5), activation = 'relu', padding='same',kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
+model.add(Conv2D(512,(5,5), activation = 'relu', padding='same',kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
 model.add(BatchNormalization())
 model.add(MaxPooling2D((2,2)))
 model.add(Dropout(0.3))
 
-model.add(Conv2D(128,(3,3), activation = 'relu', padding='same',kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
+model.add(Conv2D(768,(3,3), activation = 'relu', padding='same',kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
 model.add(BatchNormalization())
 model.add(MaxPooling2D((2,2)))
 model.add(Dropout(0.35))
 
-# model.add(Conv2D(512,(3,3), activation = 'relu', padding='same',kernel_initializer='glorot_normal'))
-# model.add(BatchNormalization())
-# model.add(MaxPooling2D((2,2)))
-# model.add(Dropout(0.4))
+model.add(Conv2D(512,(3,3), activation = 'relu', padding='same',kernel_initializer='glorot_normal'))
+model.add(BatchNormalization())
+model.add(MaxPooling2D((2,2)))
+model.add(Dropout(0.4))
 
 
 model.add(Flatten())
 
 
-model.add(Dense(1024,kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
+model.add(Dense(512,kernel_initializer=keras.initializers.RandomNormal(mean=0.0,stddev=0.05,seed=666)))
 model.add(Activation('relu'))
 model.add(BatchNormalization())
 model.add(Dropout(0.5)) 
