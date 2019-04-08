@@ -177,8 +177,7 @@ history = model.fit(
     x=train_feature,
     y=train_label,
     batch_size=128,
-    steps_per_epoch=len(train_feature)/16+1,
-    epochs=1,
+    epochs=200,
     validation_data=(valid_feature,valid_label),
     callbacks=[mcp,es])
 # model.fit(feature,label,batch_size=10,epochs=50)
