@@ -56,8 +56,8 @@ def parsingTrainingData(file_name) :
 
   train_feature = (train_feature - mean) / (std +1e-20) 
   
-  np.save('nor_only_mean',mean)
-  np.save('nor_only_std',std)
+  np.save('both_mean',mean)
+  np.save('both_std',std)
 
   return train_feature,train_label,valid_feature,valid_label,mean,std
 
@@ -146,18 +146,18 @@ model.add(Dropout(0.5))
 
 model.add(Dense(units=7,activation='softmax'))
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
-# datagen = ImageDataGenerator(
-#     rotation_range=30,
-#     width_shift_range=0.2,
-#     height_shift_range=0.2,
-#     zoom_range=[0.8,1.2],
-#     shear_range=0.2,
-#     horizontal_flip=True)
+datagen = ImageDataGenerator(
+    rotation_range=30,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    zoom_range=[0.8,1.2],
+    shear_range=0.2,
+    horizontal_flip=True)
 
 model.summary()
 
 
-mcp = keras.callbacks.ModelCheckpoint('mcp-nor-only-acc-{val_acc:.5f}.h5',
+mcp = keras.callbacks.ModelCheckpoint('mcp-both-acc-{val_acc:.5f}.h5',
     monitor='val_acc',
     save_best_only=True,
     verbose=1,
@@ -174,9 +174,7 @@ es = keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
 
 # datagen.fit(train_feature)
 history = model.fit_generator(
-    x=train_feature,
-    y=train_label,
-    batch_size=128,
+    datagen.flow(train_feature,train_label,batch_size=128),
     steps_per_epoch=len(train_feature)/16+1,
     epochs=1,
     validation_data=(valid_feature,valid_label),
@@ -197,20 +195,20 @@ result = model.predict(test_in)
 
 
 # write result ###########################################################################
-writeResult('nor_only.csv',result)
+writeResult('both.csv',result)
 
 
 # save model
-model.save('nor_only_m.h5')
+model.save('both_m.h5')
  
 # save history of acc loss
 np_val_acc = np.array(history.history['val_acc'])
 np_tra_acc = np.array(history.history['acc'])
 np_val_loss = np.array(history.history['val_loss'])
 np_tra_loss = np.array(history.history['loss'])
-np.save('nor_only_val_loss',np_val_loss)
-np.save('nor_only_tra_loss',np_tra_loss)
-np.save('nor_only_val_acc',np_val_acc)
-np.save('nor_only_tra_acc',np_tra_acc)
+np.save('both_val_loss',np_val_loss)
+np.save('both_tra_loss',np_tra_loss)
+np.save('both_val_acc',np_val_acc)
+np.save('both_tra_acc',np_tra_acc)
 print('end')
 
