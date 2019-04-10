@@ -1,5 +1,6 @@
 
-
+# $1 test.csv
+# $2 predict file (output file)
 
 wget https://github.com/Liu-Shi-Tang/ML_model/releases/download/hw3/both_mean.npy
 wget https://github.com/Liu-Shi-Tang/ML_model/releases/download/hw3/both_std.npy

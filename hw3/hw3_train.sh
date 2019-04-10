@@ -1,4 +1,5 @@
 
+# $1 is train.csv
 
 python ./train.py $1
 python ./train_no.py $1 
