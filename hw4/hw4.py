@@ -1,3 +1,4 @@
+import os
 import sys
 import keras.backend as K
 import numpy as np
@@ -78,8 +79,8 @@ dataFile = sys.argv[1]
 outputPath = sys.argv[2]
 # For toleration
 try :
+  os.makedirs('{}'.format(outputPath))
   print('create dir: {}'.format(outputPath))
-  os.makedirs(outputPath)
 except:
   print('{} exists!'.format(outputPath))
 
@@ -127,6 +128,45 @@ for i in which_picture :
 print('Finish saliency map')
 
 ############################################# finish saliency map #####################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+############################################ for fig2_2.jpg ##########################################
+
+# input layer
+input_img = model.input
+# Get layers for observation
+focus_layers = []
+for layer in model.layers :
+    print(layer.name)
+    if layer.name == 'conv2d_1' :
+        focus_layers.append( K.function([input_img , K.learning_phase()] , [layer.output]) )
+
+
+for i,layer in enumerate(focus_layers)  :
+    # randomly choosing a picture from 7 picture (size = 48x48x1)
+    picture = features[0].reshape(1,48,48,1)
+    output = layer([picture,0])
+    # number of ofilter for observation
+    n_filter = 32
+    fig , ax = plt.subplots( nrows= n_filter//8, ncols = 8 , figsize=(14, 8))
+    plt.tight_layout()
+    for j in range(n_filter) :
+        # ax = fig.add_subplot(n_filter/8, 8, i+1)
+        ax[j//8,j%8].imshow(output[0][0, :, :, j], cmap='Oranges')
+        ax[j//8,j%8].set_title('filter {}'.format(j)) 
+    fig.savefig('{}fig2_2.jpg'.format(outputPath))
+    plt.close()
 
 ############################################# start to run lime ########################################
 def predicFunction(features) :
