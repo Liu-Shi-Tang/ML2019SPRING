@@ -52,8 +52,8 @@ x_adv = x
 x_noise = np.zeros_like(x)
 
 # Set variables
-epochs = 210
-epsilon = 0.02
+epochs = 25
+epsilon = 0.25
 #prev_probs = []
 target = K.one_hot(initial_class, 1000)
 for j in range(epochs): 
