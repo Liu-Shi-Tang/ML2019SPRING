@@ -155,7 +155,7 @@ for layer in model.layers :
 
 for i,layer in enumerate(focus_layers)  :
     # randomly choosing a picture from 7 picture (size = 48x48x1)
-    picture = features[0].reshape(1,48,48,1)
+    picture = features[3].reshape(1,48,48,1)
     output = layer([picture,0])
     # number of ofilter for observation
     n_filter = 32
