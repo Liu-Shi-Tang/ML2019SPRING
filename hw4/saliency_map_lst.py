@@ -1,4 +1,3 @@
-# import os
 import sys
 import keras.backend as K
 import numpy as np
@@ -7,26 +6,13 @@ import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 from keras.models import Model, load_model
 
 # TO limit memory usage for protability
-import tensorflow as tf
-from keras.backend.tensorflow_backend import set_session
-config_tf = tf.ConfigProto()
-config_tf.gpu_options.per_process_gpu_memory_fraction = 0.7
-sess = tf.Session(config=config_tf)
-set_session(sess)
-# sess.run(init)
-# base_dir = './'
-# img_dir = os.path.join(base_dir, 'image')
-# if not os.path.exists(img_dir):
-#   os.makedirs(img_dir)
-# cmap_dir = os.path.join(img_dir, 'cmap')
-# if not os.path.exists(cmap_dir):
-#   os.makedirs(cmap_dir)
-# partial_see_dir = os.path.join(img_dir,'partial_see')
-# if not os.path.exists(partial_see_dir):
-#   os.makedirs(partial_see_dir)
-# origin_dir = os.path.join(img_dir,'origin')
-# if not os.path.exists(origin_dir):
-#   os.makedirs(origin_dir)
+# import tensorflow as tf
+# from keras.backend.tensorflow_backend import set_session
+# config_tf = tf.ConfigProto()
+# config_tf.gpu_options.per_process_gpu_memory_fraction = 0.7
+# sess = tf.Session(config=config_tf)
+# set_session(sess)
+
 
 def parsingInput(file_name) :
   # size : 48 X 48
@@ -70,33 +56,7 @@ def parsingInput(file_name) :
         break ;
   sal_feature = np.array(sal_feature)
   sal_label = np.array(sal_label)
-  # np.save('Y_train_label',sal_label)
-  # np.save('X_train',sal_feature)
   return sal_feature,sal_label
-
-class GradientSaliency():
-  def __init__(self, model, output_index = 0):
-    '''
-      define a function to return gradient from specified output
-      output_index  : if the label of a picture is 6 , then we will calaulate the gradient
-                      from input to the 6-th output
-      model         : the model we trained before
-    '''
-    # Define the function to compute the gradient
-
-    # To get the input layer, and it will be used in calculating gradient
-    input_tensors = [model.input]
-    # To get the gradient
-    gradients = model.optimizer.get_gradients(model.output[0][output_index], model.input)
-    # To create an keras object
-    self.compute_gradients = K.function(inputs = input_tensors, outputs = gradients)
-
-  def get_mask(self, input_image):
-    # Execute the function to compute the gradient
-    x_value = np.expand_dims(input_image, axis=0)
-    gradients = self.compute_gradients([x_value])[0][0]
-    # return the gradient calculated by keras object which was created in constructor
-    return gradients
 
 
 # read model
@@ -106,18 +66,10 @@ model = load_model(model_name)
 dataFile = sys.argv[1]
 # loading data from previous 
 features, labels =   parsingInput(dataFile)
-print(features.shape,labels.shape)
   
 n_classes = 7
 # which picture we want to generate saliency map for 
 which_picture = [0,1,2,3,4,5,6]
-
-# X_train = np.load('X_train.npy')
-# Y_train_label = np.load('Y_train_label.npy')
-
-
-fig, ax = plt.subplots(nrows=n_classes,  ncols=3)
-fig.suptitle('SaliencyMap')
 
 
 
@@ -125,16 +77,31 @@ for i in which_picture :
   # get a image
   img = features[i]
   print(labels[i])
-  # initialize customized object
-  vanilla = GradientSaliency(model, int(labels[i]))
-  # To get the mask from gradients
-  mask = vanilla.get_mask(img)
-  filter_mask = (mask > 0.0).reshape((48, 48))
+ 
+  # To get the gradient
+  gradients = model.optimizer.get_gradients(model.output[0][int(labels[i])], model.input)
+  # To create an keras object
+  compute_gradients = K.function(inputs = [model.input], outputs = gradients)
+  # Execute the function to compute the gradient
+  img_exp = np.expand_dims(img, axis=0)
+
+  # To get the saliency map
+  sal_map = compute_gradients([img_exp])[0][0]
+  sal_map = np.abs(sal_map) 
+  ma = np.max(sal_map)
+  # For masking partial figure
+  filter_map = (sal_map > (ma*0.08)).reshape((48, 48))
+
+  # start to ploting
+  fig, ax = plt.subplots(nrows=1,  ncols=3)
+  fig.suptitle('SaliencyMap {}'.format(labels[i]))
+  ax[0].imshow(img.reshape((48, 48)), cmap = 'gray')
+  cax = ax[1].imshow(sal_map.reshape((48, 48)), cmap = 'jet')
+  fig.colorbar(cax, ax = ax[1])
+  ax[2].imshow(img.reshape((48, 48)) * filter_map, cmap = 'gray')
+  plt.savefig('fig1_{}.jpg'.format(int(labels[i])))
+
+print('Finish saliency map')
 
 
-  ax[i, 0].imshow(img.reshape((48, 48)), cmap = 'gray')
-  cax = ax[i, 1].imshow(mask.reshape((48, 48)), cmap = 'jet')
-  fig.colorbar(cax, ax = ax[i, 1])
-  ax[i, 2].imshow(mask.reshape((48, 48)) * filter_mask, cmap = 'gray')
-plt.savefig('Saliency_map.png')
-plt.show()
+
