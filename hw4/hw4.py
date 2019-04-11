@@ -68,6 +68,7 @@ def parsingInput(file_name) :
   
   return sal_feature,sal_label
 
+################################################## prepare for input ##################################
 
 # read model
 model_name = 'mcp-best-acc-0.68250.h5'
@@ -75,6 +76,13 @@ model = load_model(model_name)
 # read data (label is not on-hot format)
 dataFile = sys.argv[1]
 outputPath = sys.argv[2]
+# For toleration
+try :
+  print('create dir: {}'.format(outputPath))
+  os.makedirs(outputPath)
+except:
+  print('{} exists!'.format(outputPath))
+
 # loading data from previous 
 features, labels =   parsingInput(dataFile)
   
@@ -82,6 +90,10 @@ n_classes = 7
 # which picture we want to generate saliency map for 
 which_picture = [0,1,2,3,4,5,6]
 
+
+#################################################  finish preparation ###############################
+
+################################################   saliency map ####################################
 
 for i in which_picture :
   # get a image
@@ -109,10 +121,12 @@ for i in which_picture :
   cax = ax[1].imshow(sal_map.reshape((48, 48)), cmap = 'jet')
   fig.colorbar(cax, ax = ax[1])
   ax[2].imshow(img.reshape((48, 48)) * filter_map, cmap = 'gray')
-  plt.savefig('fig1_{}.jpg'.format(int(labels[i])))
+  plt.savefig('{}fig1_{}.jpg'.format(outputPath,int(labels[i])))
   plt.close()
 
 print('Finish saliency map')
+
+############################################# finish saliency map #####################################
 
 ############################################# start to run lime ########################################
 def predicFunction(features) :
@@ -158,5 +172,5 @@ for i in range(7) :
   x = image
   x = x.reshape(48,48,3)
   plt.imshow(mark_boundaries(skimage.color.gray2rgb(x), mask),interpolation ='nearest')
-  plt.savefig("fig3_{}.jpg".format(int(labels[i])))
+  plt.savefig("{}fig3_{}.jpg".format(outputPath,int(labels[i])))
 
