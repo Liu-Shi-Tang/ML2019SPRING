@@ -130,15 +130,50 @@ print('Finish saliency map')
 ############################################# finish saliency map #####################################
 
 
+############################################ for fig2_1.jpg ##########################################
 
 
+def normalize(x):
+    # utility function to normalize a tensor by its L2 norm
+    return x / (K.sqrt(K.mean(K.square(x))) + 1e-7)
 
+num_steps = 300
+record_freq = 50
 
+layer_dict = dict([layer.name, layer] for layer in model.layers)
+input_img = model.input
 
+name_ls = ['conv2d_1']
 
+collect_layers = [ layer_dict[name].output for name in name_ls ]
 
+n_filter = 32
 
+for cnt, c in enumerate(collect_layers):
+    imgs = []
+    for filter_idx in range(n_filter):
+        input_img_data = np.random.random((1, 48, 48, 1)) # random noise
+        target = K.mean(c[:, :, :, filter_idx])
+        grads = normalize(K.gradients(target, input_img)[0])
+        iterate = K.function([input_img, K.learning_phase()], [target, grads])
 
+        # calculate img
+        input_image_data = np.copy(input_img_data)
+        learning_rate = 0.05
+        for i in range(num_steps):
+            target, grads_val = iterate([input_image_data, 0])
+            input_image_data += grads_val * learning_rate
+        imgs.append(input_image_data)
+
+    fig , ax = plt.subplots( nrows= n_filter//8, ncols = 8 , figsize=(14, 8))
+    plt.tight_layout()
+    for j in range(n_filter) :
+        origin_img = imgs[j][0].reshape(48, 48, 1)
+        origin_img = np.clip(origin_img, 0, 1).astype('uint8')
+        ax[j//8,j%8].imshow(origin_img.squeeze(), cmap='Oranges')
+        ax[j//8,j%8].set_title('filter {}'.format(j)) 
+    fig.savefig('{}fig2_1.jpg'.format(outputPath))
+    plt.close()
 
 
 ############################################ for fig2_2.jpg ##########################################
