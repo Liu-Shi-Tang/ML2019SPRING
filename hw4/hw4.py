@@ -62,7 +62,7 @@ def parsingInput(file_name) :
       if ( int(label[j]) == int(i) ) :
         sal_feature.append(feature[j])
         sal_label.append(label[j])
-        print(j)
+        # print(j)
         break ;
   sal_feature = np.array(sal_feature)
   sal_label = np.array(sal_label)
@@ -99,7 +99,7 @@ which_picture = [0,1,2,3,4,5,6]
 for i in which_picture :
   # get a image
   img = features[i]
-  print(labels[i])
+  # print(labels[i])
  
   # To get the gradient
   gradients = model.optimizer.get_gradients(model.output[0][int(labels[i])], model.input)
@@ -175,7 +175,7 @@ for cnt, c in enumerate(collect_layers):
     fig.savefig('{}fig2_1.jpg'.format(outputPath))
     plt.close()
 
-
+print('finish fig2_1.jpg')
 ############################################ for fig2_2.jpg ##########################################
 
 # input layer
@@ -183,7 +183,7 @@ input_img = model.input
 # Get layers for observation
 focus_layers = []
 for layer in model.layers :
-    print(layer.name)
+    # print(layer.name)
     if layer.name == 'conv2d_1' :
         focus_layers.append( K.function([input_img , K.learning_phase()] , [layer.output]) )
 
@@ -202,6 +202,9 @@ for i,layer in enumerate(focus_layers)  :
         ax[j//8,j%8].set_title('filter {}'.format(j)) 
     fig.savefig('{}fig2_2.jpg'.format(outputPath))
     plt.close()
+
+
+print('finish fig2_2.jpg')
 
 ############################################# start to run lime ########################################
 def predicFunction(features) :
@@ -248,4 +251,6 @@ for i in range(7) :
   x = x.reshape(48,48,3)
   plt.imshow(mark_boundaries(skimage.color.gray2rgb(x), mask),interpolation ='nearest')
   plt.savefig("{}fig3_{}.jpg".format(outputPath,int(labels[i])))
+
+print('finish lime!')
 
