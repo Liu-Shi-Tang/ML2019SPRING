@@ -62,7 +62,7 @@ def testOnePicture (model, device, data, epsilon, lossFunc) :
         if output_label_attack.item() != output_label_ori.item():
             return acctackImg, True
         else :
-           data = attackImg.clone().detach()
+            data = attackImg.clone().detach()
             # data = torch.tensor(attackImg)  
 
     return oriData , False
