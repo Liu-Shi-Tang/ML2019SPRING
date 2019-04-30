@@ -152,7 +152,64 @@ myRNNModel = getModel(embedding_layer)
 myRNNModel.summary()
 
 
-history = myRNNModel.fit(x=train_x_wv,y=train_y_one_hot,batch_size=128,epochs=30,validation_split=0.1)
+history = myRNNModel.fit(x=train_x_wv,y=train_y_one_hot,batch_size=128,epochs=5,validation_split=0.1)
+
+
+############################################### testing ###############################
+
+
+test_x_file_name = sys.argv[3]
+
+
+test_x = []
+
+# read train x
+with open(test_x_file_name,'r',encoding = 'utf-8') as f :
+    lines = f.readlines()
+    for i,line in enumerate(lines) :
+        # ignore first line "id,comment"
+        if i != 0 :
+            # words = line.split(',',1)
+            # word = words[1]
+            # train_x.append(word)
+            test_x.append(line.split(',',1)[1])
+
+
+# cut train x 
+test_cutWords = []
+for x in test_x :
+    # Using accurate mode
+    setList = jieba.cut(x,cut_all=False)
+    test_cutWords.append([])
+    for w in setList :
+        test_cutWords[-1].append(w)
+
+# input length
+SEQUENCE_LENGTH = 30
+test_x_wv = text_to_index(test_cutWords)
+test_x_wv = pad_sequences(test_x_wv,maxlen = SEQUENCE_LENGTH)
+
+result = myRNNModel.predict(test_x_wv)
+
+print(result)
+print(result.shape)
+print(type(result))
+
+
+with open('result.csv','w') as f :
+    f.write('id,label\n')
+    for i in range(len(result)) :
+        f.write(str(i) + ',' + str(int(np.argmax(result[i]))) + '\n')
+    f.close()
+print("end")
+
+
+
+
+
+
+
+
 
 
 
