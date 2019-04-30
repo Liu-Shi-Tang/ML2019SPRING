@@ -69,7 +69,7 @@ for x in train_x :
 from gensim.models import Word2Vec
 
 # reference : https://radimrehurek.com/gensim/models/word2vec.html
-model = Word2Vec(cutWords,size=100,window=5,iter=10,min_count=1,workers=4,)
+model = Word2Vec(cutWords,size=250,window=5,iter=10,min_count=1,workers=4,)
 model.save("word2vec.model")
 
 ###########################################start to using keras######################################
@@ -153,7 +153,7 @@ myRNNModel = getModel(embedding_layer)
 myRNNModel.summary()
 
 
-history = myRNNModel.fit(x=train_x_wv,y=train_y_one_hot,batch_size=128,epochs=7,validation_split=0.1)
+history = myRNNModel.fit(x=train_x_wv,y=train_y_one_hot,batch_size=128,epochs=11,validation_split=0.1)
 
 
 ############################################### testing ###############################
