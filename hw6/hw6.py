@@ -62,7 +62,7 @@ for x in train_x :
         cutWords[-1].append(w)
 
 # observe the cut words of 10-th line
-print(cutWords[10])
+# print(cutWords[10])
 
 
 ############################################training word2Vec#########################################
@@ -72,6 +72,14 @@ from gensim.models import Word2Vec
 model = Word2Vec(cutWords,size=100,window=5,min_count=1,workers=4)
 model.save("word2vec.model")
 
+###########################################start to using keras######################################
+
+import numpy as np
+import pandas as pd
+from keras.preprocessing.sequence import pad_sequences
+from keras.utils import to_categorical
+from keras.models import Sequential
+from keras.layers import Embedding, GRU, Dense
 
 
 
