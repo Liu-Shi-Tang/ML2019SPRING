@@ -9,21 +9,21 @@ jieba.load_userdict(path_dict)
 #####################################Using jieba#############################################
 
 
-# For test
-sequence = "我來到一個島...阿!還有early simple base line"
-
-# cut a sequence by full mode (and get a generator)
-setList = jieba.cut(sequence,cut_all=True)
-
-# extract word from generator (which is return by jieba.cut)
-wordList = []
-for c in setList :
-    wordList.append(c)
-
-# print it out
-print("print it out:")
-for w in wordList :
-    print (w)
+# # For test
+# sequence = "我來到一個島...阿!還有early simple base line"
+# 
+# # cut a sequence by full mode (and get a generator)
+# setList = jieba.cut(sequence,cut_all=True)
+# 
+# # extract word from generator (which is return by jieba.cut)
+# wordList = []
+# for c in setList :
+#     wordList.append(c)
+# 
+# # print it out
+# print("print it out:")
+# for w in wordList :
+#     print (w)
 
 ############################################################################################
 
