@@ -83,7 +83,7 @@ from keras.layers import Embedding, GRU, Dense
 
 
 
-embedding_matrix = np.zeros((len(model.wv.vocab.items())+1) , model.vector_size)
+embedding_matrix = np.zeros((len(model.wv.vocab.items())+1 , model.vector_size))
 
 word2idx = {}
 
@@ -93,7 +93,7 @@ for word , others in model.wv.vocab.items() :
 
 for i , vocab in enumerate(vocab_list) :
     word , vector = vocab
-    embedding_matrix[i+1] = vec
+    embedding_matrix[i+1] = vector
     word2idx[word] = i+1
 
 
@@ -112,12 +112,19 @@ def text_to_index(corpus) :
                 new_doc.append(word2idx[word])
             except :
                 new_doc.append(0)
-         new_corpus.append(new_doc)
+        new_corpus.append(new_doc)
     return np.array(new_corpus)
 
 
 
+# input length
+SEQUENCE_LENGTH = 30
+train_x_wv = text_to_index(cutWords)
+train_x_wv = pad_sequences(train_x_wv,maxlen = SEQUENCE_LENGTH)
 
+# test code
+# print (train_x_wv.shape)
+# print("train_x_wv[0]" + str(train_x_wv[0]))
 
 
 
