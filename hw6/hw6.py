@@ -138,8 +138,9 @@ print("train_y_one_hot[0]:" , str(train_y_one_hot[0]))
 def getModel(emLayer) :
     model = Sequential()
     model.add(emLayer)
-    model.add(GRU(16))
-    model.add(Dense(100,activation='relu'))
+    model.add(GRU(32))
+    model.add(Dense(300,activation='relu'))
+    model.add(Dense(200,activation='relu'))
     model.add(Dense(100,activation='relu'))
     model.add(Dense(2,activation='softmax'))
     model.compile(
@@ -152,7 +153,7 @@ myRNNModel = getModel(embedding_layer)
 myRNNModel.summary()
 
 
-history = myRNNModel.fit(x=train_x_wv,y=train_y_one_hot,batch_size=128,epochs=5,validation_split=0.1)
+history = myRNNModel.fit(x=train_x_wv,y=train_y_one_hot,batch_size=128,epochs=10,validation_split=0.1)
 
 
 ############################################### testing ###############################
