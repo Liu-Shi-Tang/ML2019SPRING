@@ -69,7 +69,7 @@ for x in train_x :
 from gensim.models import Word2Vec
 
 # reference : https://radimrehurek.com/gensim/models/word2vec.html
-model = Word2Vec(cutWords,size=100,window=5,min_count=1,workers=4)
+model = Word2Vec(cutWords,size=100,window=5,iter=10,min_count=1,workers=4,)
 model.save("word2vec.model")
 
 ###########################################start to using keras######################################
@@ -118,7 +118,7 @@ def text_to_index(corpus) :
 
 
 # input length
-SEQUENCE_LENGTH = 30
+SEQUENCE_LENGTH = 50
 train_x_wv = text_to_index(cutWords)
 train_x_wv = pad_sequences(train_x_wv,maxlen = SEQUENCE_LENGTH)
 
@@ -139,9 +139,9 @@ def getModel(emLayer) :
     model = Sequential()
     model.add(emLayer)
     model.add(GRU(32))
-    model.add(Dense(300,activation='relu'))
-    model.add(Dense(200,activation='relu'))
-    model.add(Dense(100,activation='relu'))
+    model.add(Dense(300,activation='sigmoid'))
+    model.add(Dense(200,activation='sigmoid'))
+    model.add(Dense(100,activation='sigmoid'))
     model.add(Dense(2,activation='softmax'))
     model.compile(
         optimizer='adam',
@@ -153,7 +153,7 @@ myRNNModel = getModel(embedding_layer)
 myRNNModel.summary()
 
 
-history = myRNNModel.fit(x=train_x_wv,y=train_y_one_hot,batch_size=128,epochs=10,validation_split=0.1)
+history = myRNNModel.fit(x=train_x_wv,y=train_y_one_hot,batch_size=128,epochs=7,validation_split=0.1)
 
 
 ############################################### testing ###############################
@@ -186,7 +186,7 @@ for x in test_x :
         test_cutWords[-1].append(w)
 
 # input length
-SEQUENCE_LENGTH = 30
+SEQUENCE_LENGTH = 50
 test_x_wv = text_to_index(test_cutWords)
 test_x_wv = pad_sequences(test_x_wv,maxlen = SEQUENCE_LENGTH)
 
