@@ -123,8 +123,16 @@ train_x_wv = text_to_index(cutWords)
 train_x_wv = pad_sequences(train_x_wv,maxlen = SEQUENCE_LENGTH)
 
 # test code
-# print (train_x_wv.shape)
-# print("train_x_wv[0]" + str(train_x_wv[0]))
+print (train_x_wv.shape)
+print("train_x_wv[0]" + str(train_x_wv[0]))
+
+
+# For one-hot encoding
+train_y_one_hot = to_categorical(train_y,2)
+
+# test code
+print(train_y_one_hot.shape)
+print("train_y_one_hot[0]:" , str(train_y_one_hot[0]))
 
 
 
