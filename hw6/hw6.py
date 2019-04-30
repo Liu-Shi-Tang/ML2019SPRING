@@ -3,6 +3,7 @@ import sys
 
 # Load dict from TA
 path_dict = "dict.txt.big/dict.txt.big"
+jieba.dt.tmp_dir = "./"
 jieba.load_userdict(path_dict)
 
 #####################################Using jieba#############################################
