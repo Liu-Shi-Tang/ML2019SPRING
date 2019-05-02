@@ -1,13 +1,16 @@
 import jieba  # For cutting word
 import sys
 
+train_x_file_name = sys.argv[1]
+train_y_file_name = sys.argv[2]
+path_dict         = sys.argv[3]
+
+
 # Load dict from TA
-path_dict = "dict.txt.big/dict.txt.big"
 jieba.dt.tmp_dir = "./"
 jieba.load_userdict(path_dict)
 
-train_x_file_name = sys.argv[1]
-train_y_file_name = sys.argv[2]
+
 
 train_x = []
 train_y = []

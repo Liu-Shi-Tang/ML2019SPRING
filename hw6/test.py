@@ -10,9 +10,13 @@ from keras.preprocessing.sequence import pad_sequences
 model = Word2Vec.load("word2vec.model")
 
 
+test_x_file_name = sys.argv[1]
+path_dict        = sys.argv[2]
+result_file_name = sys.argv[3]
+
+
 # Load dict from TA
-path_dict = "dict.txt.big/dict.txt.big"
-jieba.dt.tmp_dir = "./"
+jieba.dt.tmp_dir = "./" # set cache dir
 jieba.load_userdict(path_dict)
 
 
@@ -40,9 +44,6 @@ def text_to_index(corpus) :
     return np.array(new_corpus)
 
 
-
-test_x_file_name = sys.argv[1]
-result_file_name = sys.argv[2]
 
 test_x = []
 
@@ -84,17 +85,6 @@ with open(result_file_name,'w') as f :
 
 
 print("Produce {}".format(result_file_name))
-
-
-
-
-
-
-
-
-
-
-
 
 
 
