@@ -13,6 +13,7 @@ dictTxtBig="./dict.txt.big/dict.txt.big"
 
 if [ $# -eq 4 ]
 then
+  echo "Get 4 arg"
   trainX=$1
   trainY=$2
   testX=$3
