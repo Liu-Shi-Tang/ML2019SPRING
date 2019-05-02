@@ -6,27 +6,6 @@ path_dict = "dict.txt.big/dict.txt.big"
 jieba.dt.tmp_dir = "./"
 jieba.load_userdict(path_dict)
 
-#####################################Using jieba#############################################
-
-
-# # For test
-# sequence = "我來到一個島...阿!還有early simple base line"
-# 
-# # cut a sequence by full mode (and get a generator)
-# setList = jieba.cut(sequence,cut_all=True)
-# 
-# # extract word from generator (which is return by jieba.cut)
-# wordList = []
-# for c in setList :
-#     wordList.append(c)
-# 
-# # print it out
-# print("print it out:")
-# for w in wordList :
-#     print (w)
-
-############################################################################################
-
 train_x_file_name = sys.argv[1]
 train_y_file_name = sys.argv[2]
 
@@ -68,9 +47,8 @@ for x in train_x :
 ############################################training word2Vec#########################################
 from gensim.models import Word2Vec
 
-# reference : https://radimrehurek.com/gensim/models/word2vec.html
-model = Word2Vec(cutWords,size=250,window=5,iter=10,min_count=1,workers=4,)
-model.save("word2vec.model")
+# Load pretrain Word2Vec model
+model = Word2Vec.load("word2vec.model")
 
 ###########################################start to using keras######################################
 
@@ -80,7 +58,7 @@ from keras.preprocessing.sequence import pad_sequences
 from keras.utils import to_categorical
 from keras.models import Sequential
 from keras.layers import Embedding, GRU, Dense
-
+from keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint, CSVLogger
 
 
 embedding_matrix = np.zeros((len(model.wv.vocab.items())+1 , model.vector_size))
@@ -139,9 +117,9 @@ def getModel(emLayer) :
     model = Sequential()
     model.add(emLayer)
     model.add(GRU(32))
-    model.add(Dense(300,activation='sigmoid'))
-    model.add(Dense(200,activation='sigmoid'))
-    model.add(Dense(100,activation='sigmoid'))
+    model.add(Dense(256,activation='sigmoid'))
+    model.add(Dense(64,activation='sigmoid'))
+    model.add(Dense(16,activation='sigmoid'))
     model.add(Dense(2,activation='softmax'))
     model.compile(
         optimizer='adam',
@@ -153,68 +131,13 @@ myRNNModel = getModel(embedding_layer)
 myRNNModel.summary()
 
 
-history = myRNNModel.fit(x=train_x_wv,y=train_y_one_hot,batch_size=128,epochs=11,validation_split=0.1)
+#history = myRNNModel.fit(x=train_x_wv,y=train_y_one_hot,batch_size=128,epochs=9,validation_split=0.1)
 
+csv_logger = CSVLogger('log.csv', append=False)
+learning_rate = ReduceLROnPlateau(monitor='val_acc', patience=3, verbose=1, epsilon=1e-4, min_lr=1e-6)
+checkpoint = ModelCheckpoint(filepath='best.h5', monitor='val_acc', verbose=1, save_best_only=True)
+early_stop = EarlyStopping(monitor='val_acc', patience=6, verbose=1)
 
-############################################### testing ###############################
-
-
-test_x_file_name = sys.argv[3]
-
-
-test_x = []
-
-# read train x
-with open(test_x_file_name,'r',encoding = 'utf-8') as f :
-    lines = f.readlines()
-    for i,line in enumerate(lines) :
-        # ignore first line "id,comment"
-        if i != 0 :
-            # words = line.split(',',1)
-            # word = words[1]
-            # train_x.append(word)
-            test_x.append(line.split(',',1)[1])
-
-
-# cut train x 
-test_cutWords = []
-for x in test_x :
-    # Using accurate mode
-    setList = jieba.cut(x,cut_all=False)
-    test_cutWords.append([])
-    for w in setList :
-        test_cutWords[-1].append(w)
-
-# input length
-SEQUENCE_LENGTH = 50
-test_x_wv = text_to_index(test_cutWords)
-test_x_wv = pad_sequences(test_x_wv,maxlen = SEQUENCE_LENGTH)
-
-result = myRNNModel.predict(test_x_wv)
-
-print(result)
-print(result.shape)
-print(type(result))
-
-
-with open('result.csv','w') as f :
-    f.write('id,label\n')
-    for i in range(len(result)) :
-        f.write(str(i) + ',' + str(int(np.argmax(result[i]))) + '\n')
-    f.close()
-print("end")
-
-
-
-
-
-
-
-
-
-
-
-
-
+history = myRNNModel.fit(x=train_x_wv,y=train_y_one_hot,batch_size=128,epochs=30,validation_split=0.1,callbacks=[learning_rate, checkpoint, early_stop, csv_logger])
 
 
