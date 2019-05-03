@@ -21,7 +21,7 @@ then
 fi
 
 # training gensim model
-python trainW2v.py ${trainX} ${trainY} ${dictTxtBig}
+python trainW2v.py ${trainX} ${trainY} ${testX} ${dictTxtBig}
 
 # training keras model
 python trainKeras.py ${trainX} ${trainY} ${dictTxtBig}

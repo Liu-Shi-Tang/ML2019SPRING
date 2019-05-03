@@ -17,6 +17,10 @@ train_y = []
 with open(train_x_file_name,'r',encoding = 'utf-8') as f :
     lines = f.readlines()
     for i,line in enumerate(lines) :
+        # because there is repeated training datat after 119017
+        if i > 119018 :
+            break ;
+
         # ignore first line "id,comment"
         if i != 0 :
             # words = line.split(',',1)
@@ -28,6 +32,10 @@ with open(train_x_file_name,'r',encoding = 'utf-8') as f :
 with open(train_y_file_name,'r',encoding = 'utf-8') as f :
     lines = f.readlines()
     for i,line in enumerate(lines) :
+        # because there is repeated training datat after 119017
+        if i > 119018 :
+            break ;
+
         # ignore first line "id,comment"
         if i != 0 :
             train_y.append(line.split(',',1)[1])
@@ -58,7 +66,7 @@ import pandas as pd
 from keras.preprocessing.sequence import pad_sequences
 from keras.utils import to_categorical
 from keras.models import Sequential
-from keras.layers import Embedding, GRU, Dense
+from keras.layers import Embedding, GRU, Dense, LSTM, Dropout
 from keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint, CSVLogger
 
 
@@ -80,7 +88,7 @@ embedding_layer = Embedding(
     input_dim=embedding_matrix.shape[0],
     output_dim=embedding_matrix.shape[1],
     weights=[embedding_matrix],
-    trainable=False)
+    trainable=True)
 
 def text_to_index(corpus) :
     new_corpus = []
@@ -117,10 +125,14 @@ print("train_y_one_hot[0]:" , str(train_y_one_hot[0]))
 def getModel(emLayer) :
     model = Sequential()
     model.add(emLayer)
-    model.add(GRU(32))
-    model.add(Dense(256,activation='sigmoid'))
-    model.add(Dense(64,activation='sigmoid'))
-    model.add(Dense(16,activation='sigmoid'))
+    model.add(LSTM(256,return_sequences=False))
+#    model.add(Dropout(0.3))
+#    model.add(LSTM(25))
+#    model.add(Dropout(0.3))
+#    model.add(Dense(256,activation='sigmoid'))
+    model.add(Dense(128,activation='sigmoid'))
+#    model.add(Dropout(0.3))
+    model.add(Dense(32,activation='sigmoid'))
     model.add(Dense(2,activation='softmax'))
     model.compile(
         optimizer='adam',
@@ -139,6 +151,6 @@ learning_rate = ReduceLROnPlateau(monitor='val_acc', patience=3, verbose=1, epsi
 checkpoint = ModelCheckpoint(filepath='best.h5', monitor='val_acc', verbose=1, save_best_only=True)
 early_stop = EarlyStopping(monitor='val_acc', patience=6, verbose=1)
 
-history = myRNNModel.fit(x=train_x_wv,y=train_y_one_hot,batch_size=128,epochs=30,validation_split=0.1,callbacks=[learning_rate, checkpoint, early_stop, csv_logger])
+history = myRNNModel.fit(x=train_x_wv,y=train_y_one_hot,batch_size=128,epochs=30,validation_split=0.2,callbacks=[learning_rate, checkpoint, early_stop, csv_logger])
 
 
