@@ -147,8 +147,8 @@ def getModel(emLayer) :
 def getModel2(emLayer) :
     model2 = Sequential()
     model2.add(emLayer)
-    model2.add(LSTM(256,return_sequences=True))
-    model2.add(LSTM(128,return_sequences=False))
+    model2.add(GRU(256,return_sequences=True))
+    model2.add(GRU(128,return_sequences=False))
 #    model2.add(Dropout(0.3))
 #    model2.add(LSTM(25))
 #    model2.add(Dropout(0.3))
@@ -166,7 +166,14 @@ def getModel2(emLayer) :
 myRNNModel = getModel(embedding_layer)
 myRNNModel.summary()
 
-myRNNModel2 = getModel2(embedding_layer)
+embedding_layer2 = Embedding(
+    input_dim=embedding_matrix.shape[0],
+    output_dim=embedding_matrix.shape[1],
+    weights=[embedding_matrix],
+    trainable=True)
+
+
+myRNNModel2 = getModel2(embedding_layer2)
 myRNNModel2.summary()
 
 
