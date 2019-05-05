@@ -7,7 +7,7 @@
 # default path
 testX="392045_data/test_x.csv"
 dictTxtBig="./dict.txt.big/dict.txt.big"
-result="resul.csv"
+result="result.csv"
 
 if [ $# -eq 3 ]
 then

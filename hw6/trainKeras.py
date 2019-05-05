@@ -62,6 +62,7 @@ model = Word2Vec.load("word2vec.model")
 ###########################################start to using keras######################################
 
 import numpy as np
+np.random.seed(9527)
 import pandas as pd
 from keras.preprocessing.sequence import pad_sequences
 from keras.utils import to_categorical
@@ -123,34 +124,68 @@ print("train_y_one_hot[0]:" , str(train_y_one_hot[0]))
 
 
 def getModel(emLayer) :
-    model = Sequential()
-    model.add(emLayer)
-    model.add(LSTM(256,return_sequences=False))
-#    model.add(Dropout(0.3))
-#    model.add(LSTM(25))
-#    model.add(Dropout(0.3))
-#    model.add(Dense(256,activation='sigmoid'))
-    model.add(Dense(128,activation='sigmoid'))
-#    model.add(Dropout(0.3))
-    model.add(Dense(32,activation='sigmoid'))
-    model.add(Dense(2,activation='softmax'))
-    model.compile(
+    model1 = Sequential()
+    model1.add(emLayer)
+    model1.add(LSTM(256,return_sequences=True))
+    model1.add(LSTM(128,return_sequences=False))
+#    model1.add(Dropout(0.3))
+#    model1.add(LSTM(25))
+#    model1.add(Dropout(0.3))
+#    model1.add(Dense(256,activation='sigmoid'))
+#    model1.add(Dense(128,activation='sigmoid'))
+#    model1.add(Dropout(0.3))
+    model1.add(Dense(32,activation='sigmoid'))
+    model1.add(Dense(2,activation='softmax'))
+    model1.compile(
         optimizer='adam',
         loss='categorical_crossentropy',
         metrics=['accuracy'])
-    return model
+    return model1
+
+
+
+def getModel2(emLayer) :
+    model2 = Sequential()
+    model2.add(emLayer)
+    model2.add(LSTM(256,return_sequences=True))
+    model2.add(LSTM(128,return_sequences=False))
+#    model2.add(Dropout(0.3))
+#    model2.add(LSTM(25))
+#    model2.add(Dropout(0.3))
+#    model2.add(Dense(256,activation='sigmoid'))
+#    model2.add(Dense(64,activation='sigmoid'))
+#    model2.add(Dropout(0.3))
+    model2.add(Dense(16,activation='sigmoid'))
+    model2.add(Dense(2,activation='softmax'))
+    model2.compile(
+        optimizer='adam',
+        loss='categorical_crossentropy',
+        metrics=['accuracy'])
+    return model2
 
 myRNNModel = getModel(embedding_layer)
 myRNNModel.summary()
+
+myRNNModel2 = getModel2(embedding_layer)
+myRNNModel2.summary()
+
 
 
 #history = myRNNModel.fit(x=train_x_wv,y=train_y_one_hot,batch_size=128,epochs=9,validation_split=0.1)
 
 csv_logger = CSVLogger('log.csv', append=False)
-learning_rate = ReduceLROnPlateau(monitor='val_acc', patience=3, verbose=1, epsilon=1e-4, min_lr=1e-6)
+learning_rate = ReduceLROnPlateau(monitor='val_acc', patience=1, verbose=1, min_delta=1e-4, min_lr=1e-6)
 checkpoint = ModelCheckpoint(filepath='best.h5', monitor='val_acc', verbose=1, save_best_only=True)
-early_stop = EarlyStopping(monitor='val_acc', patience=6, verbose=1)
+early_stop = EarlyStopping(monitor='val_acc', patience=2, verbose=1)
 
-history = myRNNModel.fit(x=train_x_wv,y=train_y_one_hot,batch_size=128,epochs=30,validation_split=0.2,callbacks=[learning_rate, checkpoint, early_stop, csv_logger])
+history = myRNNModel.fit(x=train_x_wv,y=train_y_one_hot,batch_size=256,epochs=30,validation_split=0.1,shuffle=True,callbacks=[learning_rate, checkpoint, early_stop, csv_logger])
+
+
+csv_logger2 = CSVLogger('log2.csv', append=False)
+learning_rate2 = ReduceLROnPlateau(monitor='val_acc', patience=1, verbose=1, min_delta=1e-4, min_lr=1e-6)
+checkpoint2 = ModelCheckpoint(filepath='best2.h5', monitor='val_acc', verbose=1, save_best_only=True)
+early_stop2 = EarlyStopping(monitor='val_acc', patience=2, verbose=1)
+
+history2 = myRNNModel2.fit(x=train_x_wv,y=train_y_one_hot,batch_size=256,epochs=30,validation_split=0.1,shuffle=True,callbacks=[learning_rate2, checkpoint2, early_stop2, csv_logger2])
 
 

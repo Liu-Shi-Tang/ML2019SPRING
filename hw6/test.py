@@ -74,8 +74,12 @@ test_x_wv = text_to_index(test_cutWords)
 test_x_wv = pad_sequences(test_x_wv,maxlen = SEQUENCE_LENGTH)
 
 myRNNModel = load_model('best.h5')
-result = myRNNModel.predict(test_x_wv)
+result1 = myRNNModel.predict(test_x_wv)
 
+myRNNModel2 = load_model('best2.h5')
+result2 = myRNNModel.predict(test_x_wv)
+
+result = result1 + result2 
 
 with open(result_file_name,'w') as f :
     f.write('id,label\n')
