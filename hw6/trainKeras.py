@@ -67,7 +67,7 @@ import pandas as pd
 from keras.preprocessing.sequence import pad_sequences
 from keras.utils import to_categorical
 from keras.models import Sequential
-from keras.layers import Embedding, GRU, Dense, LSTM, Dropout
+from keras.layers import Embedding, GRU, Dense, LSTM, Dropout, Bidirectional
 from keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint, CSVLogger
 
 
@@ -126,15 +126,15 @@ print("train_y_one_hot[0]:" , str(train_y_one_hot[0]))
 def getModel(emLayer) :
     model1 = Sequential()
     model1.add(emLayer)
-    model1.add(LSTM(256,return_sequences=True))
-    model1.add(LSTM(128,return_sequences=False))
+    model1.add(Bidirectional(LSTM(256,return_sequences=True)))
+    model1.add(Bidirectional(LSTM(128,return_sequences=False)))
 #    model1.add(Dropout(0.3))
 #    model1.add(LSTM(25))
 #    model1.add(Dropout(0.3))
 #    model1.add(Dense(256,activation='sigmoid'))
 #    model1.add(Dense(128,activation='sigmoid'))
 #    model1.add(Dropout(0.3))
-    model1.add(Dense(32,activation='sigmoid'))
+    model1.add(Dense(16,activation='sigmoid'))
     model1.add(Dense(2,activation='softmax'))
     model1.compile(
         optimizer='adam',
@@ -147,8 +147,9 @@ def getModel(emLayer) :
 def getModel2(emLayer) :
     model2 = Sequential()
     model2.add(emLayer)
-    model2.add(GRU(256,return_sequences=True))
-    model2.add(GRU(128,return_sequences=False))
+    model2.add(Bidirectional(GRU(128,return_sequences=True)))
+    model2.add(Bidirectional(GRU(128,return_sequences=False)))
+#    model2.add(GRU(64,return_sequences=False))
 #    model2.add(Dropout(0.3))
 #    model2.add(LSTM(25))
 #    model2.add(Dropout(0.3))
@@ -162,6 +163,20 @@ def getModel2(emLayer) :
         loss='categorical_crossentropy',
         metrics=['accuracy'])
     return model2
+
+
+def getModel3(emLayer) :
+    model3 = Sequential()
+    model3.add(emLayer)
+    model3.add(GRU(128,return_sequences=True))
+    model3.add(GRU(128,return_sequences=False))
+    model3.add(Dense(16,activation='sigmoid'))
+    model3.add(Dense(2,activation='softmax'))
+    model3.compile(
+        optimizer='adam',
+        loss='categorical_crossentropy',
+        metrics=['accuracy'])
+    return model3
 
 myRNNModel = getModel(embedding_layer)
 myRNNModel.summary()
@@ -177,13 +192,25 @@ myRNNModel2 = getModel2(embedding_layer2)
 myRNNModel2.summary()
 
 
+embedding_layer3 = Embedding(
+    input_dim=embedding_matrix.shape[0],
+    output_dim=embedding_matrix.shape[1],
+    weights=[embedding_matrix],
+    trainable=True)
+
+
+myRNNModel3 = getModel3(embedding_layer3)
+myRNNModel3.summary()
+
+
+
 
 #history = myRNNModel.fit(x=train_x_wv,y=train_y_one_hot,batch_size=128,epochs=9,validation_split=0.1)
 
 csv_logger = CSVLogger('log.csv', append=False)
 learning_rate = ReduceLROnPlateau(monitor='val_acc', patience=1, verbose=1, min_delta=1e-4, min_lr=1e-6)
 checkpoint = ModelCheckpoint(filepath='best.h5', monitor='val_acc', verbose=1, save_best_only=True)
-early_stop = EarlyStopping(monitor='val_acc', patience=2, verbose=1)
+early_stop = EarlyStopping(monitor='val_acc', patience=1, verbose=1)
 
 history = myRNNModel.fit(x=train_x_wv,y=train_y_one_hot,batch_size=256,epochs=30,validation_split=0.1,shuffle=True,callbacks=[learning_rate, checkpoint, early_stop, csv_logger])
 
@@ -191,8 +218,16 @@ history = myRNNModel.fit(x=train_x_wv,y=train_y_one_hot,batch_size=256,epochs=30
 csv_logger2 = CSVLogger('log2.csv', append=False)
 learning_rate2 = ReduceLROnPlateau(monitor='val_acc', patience=1, verbose=1, min_delta=1e-4, min_lr=1e-6)
 checkpoint2 = ModelCheckpoint(filepath='best2.h5', monitor='val_acc', verbose=1, save_best_only=True)
-early_stop2 = EarlyStopping(monitor='val_acc', patience=2, verbose=1)
+early_stop2 = EarlyStopping(monitor='val_acc', patience=1, verbose=1)
 
 history2 = myRNNModel2.fit(x=train_x_wv,y=train_y_one_hot,batch_size=256,epochs=30,validation_split=0.1,shuffle=True,callbacks=[learning_rate2, checkpoint2, early_stop2, csv_logger2])
+
+
+csv_logger3 = CSVLogger('log3.csv', append=False)
+learning_rate3 = ReduceLROnPlateau(monitor='val_acc', patience=1, verbose=1, min_delta=1e-4, min_lr=1e-6)
+checkpoint3 = ModelCheckpoint(filepath='best3.h5', monitor='val_acc', verbose=1, save_best_only=True)
+early_stop3 = EarlyStopping(monitor='val_acc', patience=1, verbose=1)
+
+history3 = myRNNModel3.fit(x=train_x_wv,y=train_y_one_hot,batch_size=256,epochs=30,validation_split=0.1,shuffle=True,callbacks=[learning_rate3, checkpoint3, early_stop3, csv_logger3])
 
 

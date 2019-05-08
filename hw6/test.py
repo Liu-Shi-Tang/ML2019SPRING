@@ -79,7 +79,11 @@ result1 = myRNNModel.predict(test_x_wv)
 myRNNModel2 = load_model('best2.h5')
 result2 = myRNNModel.predict(test_x_wv)
 
-result = result1 + result2 
+myRNNModel3 = load_model('best3.h5')
+result3 = myRNNModel.predict(test_x_wv)
+
+
+result = result1 + result2 + result3 
 
 with open(result_file_name,'w') as f :
     f.write('id,label\n')
