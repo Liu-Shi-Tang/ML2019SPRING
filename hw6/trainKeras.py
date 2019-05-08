@@ -168,7 +168,7 @@ def getModel2(emLayer) :
 def getModel3(emLayer) :
     model3 = Sequential()
     model3.add(emLayer)
-    model3.add(GRU(128,return_sequences=True))
+    model3.add(GRU(256,return_sequences=True))
     model3.add(GRU(128,return_sequences=False))
     model3.add(Dense(16,activation='sigmoid'))
     model3.add(Dense(2,activation='softmax'))
