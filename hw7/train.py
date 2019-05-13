@@ -44,7 +44,7 @@ pictures = [ np.asarray(Image.open(inputDir + pic)) for pic in pngList ]
 pictures = np.array(pictures)
 
 
-pictures.astype('float32') / 255
+pictures = pictures.astype('float32') / 255
 
 
 encoder, decoder, autoencoder = getModel((32,32,3))
@@ -59,4 +59,11 @@ early_stop = EarlyStopping(monitor='val_acc', patience=5, verbose=1)
 
 history = autoencoder.fit(x=pictures,y=pictures,batch_size=256,epochs=50,validation_split=0.1,shuffle=True,callbacks=[learning_rate, checkpoint, early_stop, csv_logger])
 
+
+p = autoencoder.predict(np.expand_dims(pictures[2],axis=0))
+p = np.clip(p,0,1)
+p *= 255
+p = p.astype('uint8')
+p = Image.fromarray(p[0])
+p.save('out.jpg')
 
