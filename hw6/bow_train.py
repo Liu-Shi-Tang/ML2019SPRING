@@ -160,3 +160,37 @@ early_stop3 = EarlyStopping(monitor='val_acc', patience=2, verbose=1)
 history3 = myRNNModel3.fit(x=train_x_wv_bow,y=train_y_one_hot,batch_size=256,epochs=30,validation_split=0.1,shuffle=True,callbacks=[learning_rate3, checkpoint3, early_stop3, csv_logger3])
 
 
+
+p5_1 = '在說別人白痴之前，先想想自己'
+p5_2 = '在說別人之前先想想自己，白痴'
+
+p5_1_list = []
+p5_2_list = []
+
+for w in jieba.cut(p5_1,cut_all=False) :
+  p5_1_list.append(w)
+
+for w in jieba.cut(p5_2,cut_all=False) :
+  p5_2_list.append(w)
+
+p5_list = []
+p5_list.append(p5_1_list)
+p5_list.append(p5_2_list)
+
+
+p5_list = text_to_index(p5_list)
+
+p5_list_bow = np.zeros((len(p5_list),len(word2idx)+1),dtype=np.int8)
+for i,sentence in enumerate( p5_list) :
+    print(i)
+    for w in sentence :
+        try :
+            p5_list_bow[i,w] += 1 
+        except :
+            pass
+print("success")
+print(len(p5_list_bow))
+
+
+
+print(myRNNModel3.predict(p5_list_bow))
