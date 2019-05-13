@@ -4,7 +4,7 @@ from keras import backend as K
 from PIL import Image
 import os
 import sys
-
+import numpy as np
 
 
 def getModel (shape_in=(32,32,3)) :
@@ -33,10 +33,11 @@ def getModel (shape_in=(32,32,3)) :
 inputDir = sys.argv[1] 
 
 # extract file name
-pngList = [ file for file in os.listdir(inputDir) if file.endswith('.jpg')]
+pngList = [ file for file in os.listdir(inputDir) if file.endswith('001.jpg')]
 
-pictures = [ np.asarray(Image.open(pic)) for pic in pngList ]
+
+pictures = [ np.asarray(Image.open(inputDir + pic)) for pic in pngList ]
 pictures = np.array(pictures)
 
-print()
+print(pictures[0].shape)
 
