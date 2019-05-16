@@ -14,7 +14,7 @@ from sklearn.decomposition import PCA
 
 def getModel (shape_in=(32,32,3)) :
   input_img = Input(shape=shape_in)
-  x = Conv2D(64, (3, 3) , strides = (1,1), activation='relu')(input_img)
+  x = Conv2D(64, (3, 3) , strides = (1,1), activation='relu', padding='same')(input_img)
   x = MaxPooling2D((2, 2), strides = (2,2) , padding='same')(x)                           # width,height /= 2
   x = Conv2D(64, (3, 3) , strides = (1,1), activation='relu', padding='same')(x)
   x = MaxPooling2D((2, 2), strides = (2,2) , padding='same')(x)                           # width,height /= 2
@@ -26,13 +26,13 @@ def getModel (shape_in=(32,32,3)) :
 
 
   x = Dense(512 , activation='relu')(encoded)
-  x = Dense(3136, activation='relu')(x)
-  x = Reshape((7,7,64))(x)
+  x = Dense(4096, activation='relu')(x)
+  x = Reshape((8,8,64))(x)
   x = UpSampling2D((2, 2))(x)                                                             # width,height *= 2
-  x = Conv2DTranspose(64, (3, 3), strides=(1,1), activation='relu')(x) 
+  x = Conv2D(64, (3, 3), strides=(1,1), padding='same', activation='relu')(x) 
   x = UpSampling2D((2, 2))(x)                                                             # width,height *= 2
-  x = Conv2DTranspose(64, (3, 3), strides=(1,1), activation='relu')(x)
-  decoded = Conv2D(3, (3, 3), activation='sigmoid')(x)
+  x = Conv2D(64, (3, 3), strides=(1,1), padding='same', activation='relu')(x)
+  decoded = Conv2D(3, (3, 3), padding='same', activation='sigmoid')(x)
 
   # shape of decode is (32,32,3)
 
