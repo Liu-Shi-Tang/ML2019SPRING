@@ -32,13 +32,13 @@ processInputImgs = myencoder.predict(pictures)
 
 processInputImgs = processInputImgs.reshape((len(pictures),-1))
 
-seed = 40666888
+seed = 43095
 
 pca = PCA(n_components=96, whiten=True, random_state=seed)
 pca.fit(processInputImgs)
 processInputImgs = pca.transform(processInputImgs)
 
-result = KMeans(n_clusters = 2, max_iter=5000, n_init=50 ,verbose = 0 , n_jobs=-1 , random_state=seed).fit(processInputImgs)
+result = KMeans(n_clusters = 2, max_iter=5000, n_init=500 ,verbose = 0 , n_jobs=-1 , random_state=seed).fit(processInputImgs)
 
 
 testFile = sys.argv[2]
