@@ -49,7 +49,7 @@ def eigenFace(images) :
 
     # Plot eigenface for 1.b
     for i in range(k):
-        eigenface = process(eigen[:,i]).reshape(600,600,3)
+        eigenface = process(np.copy(eigen[:,i])).reshape(600,600,3)
         io.imsave(str(i) + '_eigenface.jpg', eigenface, quality=100)
 
     # For 1.d 
