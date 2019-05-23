@@ -14,12 +14,14 @@ from sklearn.decomposition import PCA
 
 
 inputDir = sys.argv[1] 
+testFile = sys.argv[2]
+resultFile = sys.argv[3]
 
 pngList = []
 for i in range(1,40001,1) :
   pngList.append("%06d" %i)
 
-pictures = [ np.asarray(Image.open(inputDir + pic + '.jpg')) for pic in pngList ]
+pictures = [ np.asarray(Image.open( os.path.join(inputDir,(pic + '.jpg'))  )) for pic in pngList ]
 pictures = np.array(pictures)
 
 
@@ -41,21 +43,12 @@ processInputImgs = pca.transform(processInputImgs)
 result = KMeans(n_clusters = 2, max_iter=5000, n_init=500 ,verbose = 0 , n_jobs=-1 , random_state=seed).fit(processInputImgs)
 
 
-testFile = sys.argv[2]
-
 test = np.genfromtxt( testFile , delimiter= ',' , dtype=int , skip_header=1 )
 i1 , i2 = test[:,1] , test[:,2]
 
 
-ans_label = np.load('mylabel.npy')
-count = 0 
-for i in range(len(ans_label)) :
-  if ans_label[i] == result.labels_[i] :
-    count += 1
-print("acc: ",count/len(ans_label))
 
-
-with open('result.csv','w') as f :
+with open(resultFile,'w') as f :
   f.write('id,label\n')
   for i in range(len(test)) :
     if result.labels_[i1[i]-1] == result.labels_[i2[i]-1] :
