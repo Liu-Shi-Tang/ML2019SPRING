@@ -14,14 +14,14 @@ from sklearn.decomposition import PCA
 
 def getModel (shape_in=(32,32,3)) :
   input_img = Input(shape=shape_in)
-  x = Conv2D(32, (3, 3) , strides = (1,1), activation='relu', padding='same')(input_img)
+  x = Conv2D(16, (3, 3) , strides = (1,1), activation='relu', padding='same')(input_img)
   x = MaxPooling2D((2, 2), strides = (2,2) , padding='same')(x)                           # width,height /= 2
   x = Conv2D(32, (3, 3) , strides = (1,1), activation='relu', padding='same')(x)
   # x = MaxPooling2D((2, 2), strides = (2,2) , padding='same')(x)                           # width,height /= 2
   # shape is (32/4,32/4,3)
   x = Flatten()(x)
   # x = Dense(1024 , activation='relu')(x)
-  encoded = Dense(1024 , activation='relu')(x)
+  encoded = Dense(2048 , activation='relu')(x)
   # shape of encoded is 512
 
 
