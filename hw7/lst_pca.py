@@ -18,6 +18,7 @@ NUM_OF_PICTURE = 415
 
 # TA code for process image
 def process(M): 
+    M = np.copy(M)
     M -= np.min(M)
     M /= np.max(M)
     M = (M * 255).astype(np.uint8)
@@ -48,8 +49,8 @@ def eigenFace(images) :
     '''
 
     # Plot eigenface for 1.b
-    for i in range(k):
-        eigenface = process(np.copy(eigen[:,i])).reshape(600,600,3)
+    for i in range(15):
+        eigenface = process(-eigen[:,i]).reshape(600,600,3)
         io.imsave(str(i) + '_eigenface.jpg', eigenface, quality=100)
 
     # For 1.d 
