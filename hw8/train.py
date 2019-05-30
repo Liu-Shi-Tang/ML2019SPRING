@@ -101,7 +101,7 @@ model.add(LeakyReLU(alpha=0.2))
 # model.add(BatchNormalization())
 # model.add(LeakyReLU(alpha=0.2))
 # model.add(MaxPooling2D((2,2)))
-model.add(AveragePooling2D(pool_size=(4,4)))
+model.add(AveragePooling2D(pool_size=(3,3)))
 model.add(Dropout(0.1)) 
   
 model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
@@ -117,7 +117,7 @@ model.add(LeakyReLU(alpha=0.2))
 # model.add(BatchNormalization())
 # model.add(LeakyReLU(alpha=0.2))
 # model.add(MaxPooling2D((2,2)))
-model.add(AveragePooling2D(pool_size=(2,2))) 
+model.add(AveragePooling2D(pool_size=(3,3))) 
 model.add(Dropout(0.1)) 
 
 model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
@@ -231,8 +231,8 @@ early_stop = EarlyStopping(monitor='val_acc', patience=10, verbose=1, mode='auto
 
 # datagen.fit(train_feature)
 model.fit_generator(datagen.flow(train_feature,train_label,batch_size=256),
-    steps_per_epoch=len(train_feature)/8,
-    epochs=100,
+    steps_per_epoch=len(train_feature)/4,
+    epochs=110,
     validation_data=(valid_feature,valid_label),
     callbacks=[csv_logger,learning_rate,checkpoint,early_stop])
 # model.fit(feature,label,batch_size=10,epochs=50)
