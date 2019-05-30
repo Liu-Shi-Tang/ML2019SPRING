@@ -232,7 +232,7 @@ early_stop = EarlyStopping(monitor='val_acc', patience=10, verbose=1, mode='auto
 # datagen.fit(train_feature)
 model.fit_generator(datagen.flow(train_feature,train_label,batch_size=256),
     steps_per_epoch=len(train_feature)/4,
-    epochs=110,
+    epochs=70,
     validation_data=(valid_feature,valid_label),
     callbacks=[csv_logger,learning_rate,checkpoint,early_stop])
 # model.fit(feature,label,batch_size=10,epochs=50)
