@@ -190,7 +190,7 @@ model.summary()
 ######################################################################################################################################
 
 
-model.load_weights('test.h5')
+model.load_weights('best.h5')
 
 weights = model.get_weights()
 # print("weights:")
