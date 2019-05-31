@@ -91,7 +91,7 @@ train_feature,train_label,valid_feature,valid_label = parsingTrainingData(train_
 print("Start to build model")
 model = Sequential()
 
-model.add(Conv2D(32,(3,3),input_shape = (48,48,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
+model.add(Conv2D(32,(5,5),input_shape = (48,48,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
 model.add(BatchNormalization())
 model.add(LeakyReLU(alpha=0.2))
 # model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
@@ -101,10 +101,10 @@ model.add(LeakyReLU(alpha=0.2))
 # model.add(BatchNormalization())
 # model.add(LeakyReLU(alpha=0.2))
 # model.add(MaxPooling2D((2,2)))
-model.add(AveragePooling2D(pool_size=(3,3)))
-model.add(Dropout(0.1)) 
+model.add(AveragePooling2D(pool_size=(2,2)))
+model.add(Dropout(0.05)) 
   
-model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
+model.add(DepthwiseConv2D(kernel_size=(2, 2), padding='same', activation='linear'))
 model.add(BatchNormalization())
 model.add(LeakyReLU(alpha=0.2))
 model.add(Conv2D(64,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
@@ -117,8 +117,8 @@ model.add(LeakyReLU(alpha=0.2))
 # model.add(BatchNormalization())
 # model.add(LeakyReLU(alpha=0.2))
 # model.add(MaxPooling2D((2,2)))
-model.add(AveragePooling2D(pool_size=(3,3))) 
-model.add(Dropout(0.1)) 
+model.add(AveragePooling2D(pool_size=(2,2))) 
+model.add(Dropout(0.05)) 
 
 model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
 model.add(BatchNormalization())
@@ -134,22 +134,33 @@ model.add(LeakyReLU(alpha=0.2))
 # model.add(LeakyReLU(alpha=0.2))
 # model.add(MaxPooling2D((2,2)))
 model.add(AveragePooling2D(pool_size=(2,2))) 
-model.add(Dropout(0.1)) 
+model.add(Dropout(0.05)) 
+
+model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
+model.add(BatchNormalization())
+model.add(LeakyReLU(alpha=0.2))
+model.add(Conv2D(256,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
+model.add(BatchNormalization())
+model.add(LeakyReLU(alpha=0.2))
+model.add(AveragePooling2D(pool_size=(2,2))) 
+model.add(Dropout(0.05)) 
+
+
+
+
 
 # model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
 # model.add(BatchNormalization())
 # model.add(LeakyReLU(alpha=0.2))
-# model.add(Conv2D(256,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
-# model.add(BatchNormalization())
-# model.add(LeakyReLU(alpha=0.2))
-# model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
-# model.add(BatchNormalization())
-# model.add(LeakyReLU(alpha=0.2))
-# model.add(Conv2D(256,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
+# model.add(Conv2D(512,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
 # model.add(BatchNormalization())
 # model.add(LeakyReLU(alpha=0.2))
 # model.add(MaxPooling2D((2,2)))
- 
+
+# model.add(AveragePooling2D(pool_size=(2,2))) 
+# model.add(Dropout(0.1)) 
+
+
 
 
 
@@ -177,7 +188,7 @@ model.add(Dropout(0.1))
 
 model.add(Flatten())
 
-model.add(Dense(32,kernel_initializer='glorot_normal'))
+model.add(Dense(48,kernel_initializer='glorot_normal'))
 model.add(BatchNormalization())
 model.add(Activation('relu'))
 # model.add(Dense(64,kernel_initializer='glorot_normal'))
@@ -186,7 +197,7 @@ model.add(Activation('relu'))
 # model.add(Dense(512,kernel_initializer='glorot_normal'))
 # model.add(BatchNormalization())
 # model.add(Activation('relu'))
-model.add(Dropout(0.1)) 
+# model.add(Dropout(0.1)) 
 
 # model.add(Dense(512,kernel_initializer='glorot_normal'))
 # model.add(Activation('relu'))
@@ -198,7 +209,7 @@ model.add(Dropout(0.1))
 model.add(Dense(units=7,activation='softmax'))
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
 datagen = ImageDataGenerator(
-    rotation_range=30,
+    rotation_range=25,
     width_shift_range=0.2,
     height_shift_range=0.2,
     zoom_range=[0.8,1.2],
@@ -224,15 +235,15 @@ model.summary()
 #     min_lr=0.0001)
 # 
 csv_logger = CSVLogger('log.csv', append=False)
-learning_rate = ReduceLROnPlateau(monitor='val_acc',factor = 0.2, patience=5, verbose=1, mode='auto', min_delta=1e-4,cooldown=0, min_lr=1e-8)
+learning_rate = ReduceLROnPlateau(monitor='acc',factor = 0.2, patience=4, verbose=1, mode='auto', min_delta=1e-4,cooldown=0, min_lr=1e-8)
 checkpoint = ModelCheckpoint(filepath='best.h5', monitor='val_acc', verbose=1, save_best_only=True,save_weights_only=True,mode='auto',period=1)
-early_stop = EarlyStopping(monitor='val_acc', patience=10, verbose=1, mode='auto',min_delta=0.0001 )
+early_stop = EarlyStopping(monitor='acc', patience=10, verbose=1, mode='auto',min_delta=0.0001 )
 
 
 # datagen.fit(train_feature)
-model.fit_generator(datagen.flow(train_feature,train_label,batch_size=256),
-    steps_per_epoch=len(train_feature)/4,
-    epochs=70,
+model.fit_generator(datagen.flow(train_feature,train_label,batch_size=128),
+    steps_per_epoch=len(train_feature)/32,
+    epochs=1000,
     validation_data=(valid_feature,valid_label),
     callbacks=[csv_logger,learning_rate,checkpoint,early_stop])
 # model.fit(feature,label,batch_size=10,epochs=50)
