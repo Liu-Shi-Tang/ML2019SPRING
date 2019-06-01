@@ -2,17 +2,17 @@ import numpy as np
 import sys
 import keras
 # For NN
-from keras.models import Sequential
-# For fully connection, dropout, and activation
-from keras.layers.core import Dense,Dropout,Activation
-# For convolution, pooling, and connection before fully connect
-from keras.layers import Dense, Dropout, Conv2D, MaxPooling2D, GlobalMaxPooling2D, BatchNormalization, LeakyReLU, DepthwiseConv2D, Flatten, GlobalAveragePooling2D,AveragePooling2D
+from keras.models import Sequential,load_model
 # For using optimizers
 from keras.optimizers import SGD, Adam
 from keras.utils import np_utils
 from keras.preprocessing.image import ImageDataGenerator
-from keras.layers.advanced_activations import LeakyReLU
+# For convolution, pooling, and connection before fully connect
+from keras.layers import Dense, Dropout, Conv2D, MaxPooling2D,  BatchNormalization, LeakyReLU, DepthwiseConv2D, Flatten, AveragePooling2D, Activation
+# Callbacks
 from keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint, CSVLogger
+
+
 
 # parsing input data #################################################################
 def parsingTrainingData(file_name) :
@@ -88,126 +88,66 @@ train_file = sys.argv[1]
 train_feature,train_label,valid_feature,valid_label = parsingTrainingData(train_file)
 
 # build model #####################################################################################
-print("Start to build model")
-model = Sequential()
-
-model.add(Conv2D(32,(5,5),input_shape = (48,48,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
-model.add(BatchNormalization())
-model.add(LeakyReLU(alpha=0.2))
-# model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
-# model.add(BatchNormalization())
-# model.add(LeakyReLU(alpha=0.2))
-# model.add(Conv2D(32,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
-# model.add(BatchNormalization())
-# model.add(LeakyReLU(alpha=0.2))
-# model.add(MaxPooling2D((2,2)))
-model.add(AveragePooling2D(pool_size=(2,2)))
-model.add(Dropout(0.05)) 
+def getModel() :
   
-model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
-model.add(BatchNormalization())
-model.add(LeakyReLU(alpha=0.2))
-model.add(Conv2D(64,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
-model.add(BatchNormalization())
-model.add(LeakyReLU(alpha=0.2))
-# model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
-# model.add(BatchNormalization())
-# model.add(LeakyReLU(alpha=0.2))
-# model.add(Conv2D(64,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
-# model.add(BatchNormalization())
-# model.add(LeakyReLU(alpha=0.2))
-# model.add(MaxPooling2D((2,2)))
-model.add(AveragePooling2D(pool_size=(2,2))) 
-model.add(Dropout(0.05)) 
+  model = Sequential()
+  
+  model.add(Conv2D(32,(5,5),input_shape = (48,48,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
+  model.add(BatchNormalization())
+  model.add(LeakyReLU(alpha=0.2))
+  model.add(AveragePooling2D(pool_size=(2,2)))
+  model.add(Dropout(0.05)) 
+    
+  model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
+  model.add(BatchNormalization())
+  model.add(LeakyReLU(alpha=0.2))
+  model.add(Conv2D(64,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
+  model.add(BatchNormalization())
+  model.add(LeakyReLU(alpha=0.2))
+  model.add(AveragePooling2D(pool_size=(2,2))) 
+  model.add(Dropout(0.05)) 
+  
+  model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
+  model.add(BatchNormalization())
+  model.add(LeakyReLU(alpha=0.2))
+  model.add(Conv2D(128,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
+  model.add(BatchNormalization())
+  model.add(LeakyReLU(alpha=0.2))
+  model.add(AveragePooling2D(pool_size=(2,2))) 
+  model.add(Dropout(0.05)) 
+  
+  model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
+  model.add(BatchNormalization())
+  model.add(LeakyReLU(alpha=0.2))
+  model.add(Conv2D(256,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
+  model.add(BatchNormalization())
+  model.add(LeakyReLU(alpha=0.2))
+  model.add(AveragePooling2D(pool_size=(2,2))) 
+  model.add(Dropout(0.05)) 
+  
+  
+  model.add(Flatten())
+  
+  model.add(Dense(32,kernel_initializer='glorot_normal'))
+  model.add(BatchNormalization())
+  model.add(Activation('relu'))
+  
+  
+  model.add(Dense(units=7,activation='softmax'))
+  model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
+  
+  
+  return model
 
-model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
-model.add(BatchNormalization())
-model.add(LeakyReLU(alpha=0.2))
-model.add(Conv2D(128,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
-model.add(BatchNormalization())
-model.add(LeakyReLU(alpha=0.2))
-# model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
-# model.add(BatchNormalization())
-# model.add(LeakyReLU(alpha=0.2))
-# model.add(Conv2D(128,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
-# model.add(BatchNormalization())
-# model.add(LeakyReLU(alpha=0.2))
-# model.add(MaxPooling2D((2,2)))
-model.add(AveragePooling2D(pool_size=(2,2))) 
-model.add(Dropout(0.05)) 
+model = getModel()
+model.summary()
 
-model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
-model.add(BatchNormalization())
-model.add(LeakyReLU(alpha=0.2))
-model.add(Conv2D(256,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
-model.add(BatchNormalization())
-model.add(LeakyReLU(alpha=0.2))
-model.add(AveragePooling2D(pool_size=(2,2))) 
-model.add(Dropout(0.05)) 
+csv_logger = CSVLogger('log.csv', append=False)
+learning_rate = ReduceLROnPlateau(monitor='acc',factor = 0.2, patience=4, verbose=1, mode='auto', min_delta=1e-4,cooldown=0, min_lr=1e-8)
+checkpoint = ModelCheckpoint(filepath='best.h5', monitor='val_acc', verbose=1, save_best_only=True,save_weights_only=True,mode='auto',period=1)
+early_stop = EarlyStopping(monitor='acc', patience=10, verbose=1, mode='auto',min_delta=0.0001 )
 
-
-
-
-
-# model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
-# model.add(BatchNormalization())
-# model.add(LeakyReLU(alpha=0.2))
-# model.add(Conv2D(512,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
-# model.add(BatchNormalization())
-# model.add(LeakyReLU(alpha=0.2))
-# model.add(MaxPooling2D((2,2)))
-
-# model.add(AveragePooling2D(pool_size=(2,2))) 
-# model.add(Dropout(0.1)) 
-
-
-
-
-
-
-#model.add(Dropout(0.2)) 
-
-
-
-
-# model.add(Conv2D(128,(3,3), activation = 'relu', padding='same',kernel_initializer='glorot_normal'))
-# model.add(BatchNormalization())
-# model.add(MaxPooling2D((2,2)))
-# model.add(Dropout(0.3))
-# 
-# model.add(Conv2D(256,(3,3), activation = 'relu', padding='same',kernel_initializer='glorot_normal'))
-# model.add(BatchNormalization())
-# model.add(MaxPooling2D((2,2)))
-# model.add(Dropout(0.35))
-# 
-# model.add(Conv2D(512,(3,3), activation = 'relu', padding='same',kernel_initializer='glorot_normal'))
-# model.add(BatchNormalization())
-# model.add(MaxPooling2D((2,2)))
-# model.add(Dropout(0.4))
-
-
-model.add(Flatten())
-
-model.add(Dense(32,kernel_initializer='glorot_normal'))
-model.add(BatchNormalization())
-model.add(Activation('relu'))
-# model.add(Dense(64,kernel_initializer='glorot_normal'))
-# model.add(BatchNormalization())
-# model.add(Activation('relu'))
-# model.add(Dense(512,kernel_initializer='glorot_normal'))
-# model.add(BatchNormalization())
-# model.add(Activation('relu'))
-# model.add(Dropout(0.1)) 
-
-# model.add(Dense(512,kernel_initializer='glorot_normal'))
-# model.add(Activation('relu'))
-# model.add(BatchNormalization())
-# model.add(Dropout(0.5)) 
-
-
-
-model.add(Dense(units=7,activation='softmax'))
-model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
+# For augmentation
 datagen = ImageDataGenerator(
     rotation_range=25,
     width_shift_range=0.2,
@@ -215,30 +155,6 @@ datagen = ImageDataGenerator(
     zoom_range=[0.8,1.2],
     shear_range=0.2,
     horizontal_flip=True)
-
-model.summary()
-
-
-# mcp = keras.callbacks.ModelCheckpoint('mcp-best-acc-{val_acc:.5f}.h5',
-#     monitor='val_acc',
-#     save_best_only=True,
-#     verbose=1,
-#     mode='auto',
-#     period=1)
-# 
-# es = keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
-#     factor=0.1,
-#     patience=10,
-#     verbose=1,
-#     mode='auto',
-#     min_delta=0.000001,
-#     min_lr=0.0001)
-# 
-csv_logger = CSVLogger('log.csv', append=False)
-learning_rate = ReduceLROnPlateau(monitor='acc',factor = 0.2, patience=4, verbose=1, mode='auto', min_delta=1e-4,cooldown=0, min_lr=1e-8)
-checkpoint = ModelCheckpoint(filepath='best.h5', monitor='val_acc', verbose=1, save_best_only=True,save_weights_only=True,mode='auto',period=1)
-early_stop = EarlyStopping(monitor='acc', patience=10, verbose=1, mode='auto',min_delta=0.0001 )
-
 
 # datagen.fit(train_feature)
 model.fit_generator(datagen.flow(train_feature,train_label,batch_size=128),
@@ -252,30 +168,4 @@ print('Total loss on testing set : ',score[0])
 print('accuracy of testing set : ',score[1])
 print('done')
 
-
-# read testing data #######################################################################
-#test_file = sys.argv[2] 
-#test_in = parsingTestingData(test_file)
-
-# predict for testing data ################################################################
-#result = model.predict(test_in)
-
-
-# write result ###########################################################################
-#writeResult('default.csv',result)
-
-
-  
-# save model
-# model.save('best_m.h5')
- 
-# save history of acc loss
-# np_val_acc = np.array(history.history['val_acc'])
-# np_tra_acc = np.array(history.history['acc'])
-# np_val_loss = np.array(history.history['val_loss'])
-# np_tra_loss = np.array(history.history['loss'])
-# np.save('best_val_loss',np_val_loss)
-# np.save('best_tra_loss',np_tra_loss)
-# np.save('best_val_acc',np_val_acc)
-# np.save('best_tra_acc',np_tra_acc)
 
