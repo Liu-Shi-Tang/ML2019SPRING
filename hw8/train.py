@@ -145,7 +145,7 @@ model.summary()
 csv_logger = CSVLogger('log.csv', append=False)
 learning_rate = ReduceLROnPlateau(monitor='acc',factor = 0.2, patience=4, verbose=1, mode='auto', min_delta=1e-4,cooldown=0, min_lr=1e-8)
 checkpoint = ModelCheckpoint(filepath='best.h5', monitor='val_acc', verbose=1, save_best_only=True,save_weights_only=True,mode='auto',period=1)
-early_stop = EarlyStopping(monitor='acc', patience=10, verbose=1, mode='auto',min_delta=0.0001 )
+early_stop = EarlyStopping(monitor='acc', patience=9, verbose=1, mode='auto',min_delta=0.0001 )
 
 # For augmentation
 datagen = ImageDataGenerator(
@@ -158,7 +158,7 @@ datagen = ImageDataGenerator(
 
 # datagen.fit(train_feature)
 model.fit_generator(datagen.flow(train_feature,train_label,batch_size=128),
-    steps_per_epoch=len(train_feature)/32,
+    steps_per_epoch=len(train_feature)/16,
     epochs=1000,
     validation_data=(valid_feature,valid_label),
     callbacks=[csv_logger,learning_rate,checkpoint,early_stop])
