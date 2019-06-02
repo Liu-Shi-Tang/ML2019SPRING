@@ -96,7 +96,7 @@ def getModel() :
   model.add(BatchNormalization())
   model.add(LeakyReLU(alpha=0.2))
   model.add(AveragePooling2D(pool_size=(2,2)))
-  model.add(Dropout(0.05)) 
+  model.add(Dropout(0.02)) 
     
   model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
   model.add(BatchNormalization())
@@ -105,7 +105,7 @@ def getModel() :
   model.add(BatchNormalization())
   model.add(LeakyReLU(alpha=0.2))
   model.add(AveragePooling2D(pool_size=(2,2))) 
-  model.add(Dropout(0.05)) 
+  model.add(Dropout(0.03)) 
   
   model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
   model.add(BatchNormalization())
@@ -114,7 +114,7 @@ def getModel() :
   model.add(BatchNormalization())
   model.add(LeakyReLU(alpha=0.2))
   model.add(AveragePooling2D(pool_size=(2,2))) 
-  model.add(Dropout(0.05)) 
+  model.add(Dropout(0.04)) 
   
   model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
   model.add(BatchNormalization())
@@ -128,13 +128,14 @@ def getModel() :
   
   model.add(Flatten())
   
-  model.add(Dense(32,kernel_initializer='glorot_normal'))
+  model.add(Dense(28,kernel_initializer='glorot_normal'))
   model.add(BatchNormalization())
   model.add(Activation('relu'))
   
   
   model.add(Dense(units=7,activation='softmax'))
-  model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
+  myOpt = Adam(lr=0.01)
+  model.compile(loss='categorical_crossentropy',optimizer=myOpt,metrics=['accuracy'])
   
   
   return model
@@ -143,13 +144,13 @@ model = getModel()
 model.summary()
 
 csv_logger = CSVLogger('log.csv', append=False)
-learning_rate = ReduceLROnPlateau(monitor='acc',factor = 0.2, patience=4, verbose=1, mode='auto', min_delta=1e-4,cooldown=0, min_lr=1e-8)
+learning_rate = ReduceLROnPlateau(monitor='acc',factor = 0.2, patience=6, verbose=1, mode='auto', min_delta=1e-4,cooldown=0, min_lr=1e-8)
 checkpoint = ModelCheckpoint(filepath='best.h5', monitor='val_acc', verbose=1, save_best_only=True,save_weights_only=True,mode='auto',period=1)
-early_stop = EarlyStopping(monitor='acc', patience=9, verbose=1, mode='auto',min_delta=0.0001 )
+early_stop = EarlyStopping(monitor='acc', patience=13, verbose=1, mode='auto',min_delta=0.0001 )
 
 # For augmentation
 datagen = ImageDataGenerator(
-    rotation_range=25,
+    rotation_range=20,
     width_shift_range=0.2,
     height_shift_range=0.2,
     zoom_range=[0.8,1.2],
