@@ -60,22 +60,22 @@ def getModel() :
   model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
   model.add(BatchNormalization())
   model.add(LeakyReLU(alpha=0.2))
-  model.add(Conv2D(64,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
+  model.add(Conv2D(56,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
   model.add(BatchNormalization())
   model.add(LeakyReLU(alpha=0.2))
   model.add(AveragePooling2D(pool_size=(2,2))) 
-  model.add(Dropout(0.05)) 
+  model.add(Dropout(0.02)) 
   
   
   model.add(Flatten())
   
-  model.add(Dense(28,kernel_initializer='glorot_normal'))
+  model.add(Dense(20,kernel_initializer='glorot_normal'))
   # model.add(BatchNormalization())
   model.add(Activation('relu'))
   
   
   model.add(Dense(units=7,activation='softmax'))
-  myOpt = Adam(lr=0.01)
+  myOpt = Adam(lr=0.02)
   model.compile(loss='categorical_crossentropy',optimizer=myOpt,metrics=['accuracy'])
   
   
