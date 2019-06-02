@@ -110,7 +110,7 @@ def getModel() :
   model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
   model.add(BatchNormalization())
   model.add(LeakyReLU(alpha=0.2))
-  model.add(Conv2D(128,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
+  model.add(Conv2D(256,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
   model.add(BatchNormalization())
   model.add(LeakyReLU(alpha=0.2))
   model.add(AveragePooling2D(pool_size=(2,2))) 
@@ -119,7 +119,7 @@ def getModel() :
   model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
   model.add(BatchNormalization())
   model.add(LeakyReLU(alpha=0.2))
-  model.add(Conv2D(256,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
+  model.add(Conv2D(64,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
   model.add(BatchNormalization())
   model.add(LeakyReLU(alpha=0.2))
   model.add(AveragePooling2D(pool_size=(2,2))) 
@@ -129,7 +129,7 @@ def getModel() :
   model.add(Flatten())
   
   model.add(Dense(28,kernel_initializer='glorot_normal'))
-  model.add(BatchNormalization())
+  # model.add(BatchNormalization())
   model.add(Activation('relu'))
   
   
