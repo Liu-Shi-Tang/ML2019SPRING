@@ -110,7 +110,7 @@ def getModel() :
   model.add(DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='linear'))
   model.add(BatchNormalization())
   model.add(LeakyReLU(alpha=0.2))
-  model.add(Conv2D(256,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
+  model.add(Conv2D(168,(1,1), activation = 'linear', padding='same',kernel_initializer='glorot_normal'))
   model.add(BatchNormalization())
   model.add(LeakyReLU(alpha=0.2))
   model.add(AveragePooling2D(pool_size=(2,2))) 
@@ -146,14 +146,14 @@ model.summary()
 csv_logger = CSVLogger('log.csv', append=False)
 learning_rate = ReduceLROnPlateau(monitor='acc',factor = 0.2, patience=6, verbose=1, mode='auto', min_delta=1e-4,cooldown=0, min_lr=1e-8)
 checkpoint = ModelCheckpoint(filepath='best.h5', monitor='val_acc', verbose=1, save_best_only=True,save_weights_only=True,mode='auto',period=1)
-early_stop = EarlyStopping(monitor='acc', patience=13, verbose=1, mode='auto',min_delta=0.0001 )
+early_stop = EarlyStopping(monitor='acc', patience=13, verbose=1, mode='auto',min_delta=0.00005 )
 
 # For augmentation
 datagen = ImageDataGenerator(
     rotation_range=15,
     width_shift_range=0.2,
     height_shift_range=0.2,
-    zoom_range=[0.8,1.2],
+    zoom_range=[0.85,1.15],
     shear_range=0.2,
     horizontal_flip=True)
 
