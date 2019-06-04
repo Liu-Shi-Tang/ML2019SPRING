@@ -12,9 +12,6 @@ from keras.layers import Dense, Dropout, Conv2D, MaxPooling2D,  BatchNormalizati
 # Callbacks
 from keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint, CSVLogger
 
-
-
-
 # read testing data
 test_file = sys.argv[1] 
 test_in = np.genfromtxt(fname=test_file,skip_header=1,dtype=str,delimiter=' ')
@@ -82,21 +79,12 @@ def getModel() :
   return model
 
 
-
-
 model = getModel()
-#layers = np.load('weights.npy')
-#model.set_weights(layers)
-
 model.load_weights('best.h5')
-# without std
 result = model.predict(test_in)
-
-
 
 # write result
 result_file = sys.argv[2]
-
 
 f = open(result_file,'w')
 f.write("id,label\n")

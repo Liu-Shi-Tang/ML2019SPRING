@@ -12,8 +12,6 @@ from keras.layers import Dense, Dropout, Conv2D, MaxPooling2D,  BatchNormalizati
 # Callbacks
 from keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint, CSVLogger
 
-
-
 # parsing input data #################################################################
 def parsingTrainingData(file_name) :
   # read data
@@ -36,16 +34,10 @@ def parsingTrainingData(file_name) :
   # For one-hot
   label = np_utils.to_categorical(label,7)
   
-  
   # reshaping for convolution
   feature = np.reshape(feature,(num_train,48,48,1))
-  
-  # np.save('train_X.npy', feature)
-  # sys.exit(0)
-  
   feature = feature.astype(float)
   feature = feature/255
-  
   
   # split data
   valid_feature = feature[:2000]
@@ -53,34 +45,6 @@ def parsingTrainingData(file_name) :
   train_feature = feature[2000:]
   train_label = label[2000:]
   return train_feature,train_label,valid_feature,valid_label
-
-
-
-# parsing testing data ###############################################################################
-def parsingTestingData(file_name) :
-  test_in = np.genfromtxt(fname=file_name,skip_header=1,dtype=str,delimiter=' ')
-  num_test = len(test_in)
-  
-  for i in range(num_test) :
-    test_in[i,0] = test_in[i,0].split(',')[1]
-  
-  
-  # reshaping testing data
-  test_in = np.reshape(test_in,(num_test,48,48,1))
-  test_in = test_in.astype(float)
-  test_in = test_in/255
-
-  return test_in
-
-# write result ###################################################################################
-def writeResult(file_name,result) :
-  f = open(file_name,'w')
-  f.write("id,label\n")
-  for i in range(len(result)) :
-    f.write(str(i) + ',' + str(int(np.argmax(result[i]))) + '\n')
-  
-  f.close()
-  
 
 
 # read training data #############################################################################
@@ -163,10 +127,4 @@ model.fit_generator(datagen.flow(train_feature,train_label,batch_size=128),
     epochs=1000,
     validation_data=(valid_feature,valid_label),
     callbacks=[csv_logger,learning_rate,checkpoint,early_stop])
-# model.fit(feature,label,batch_size=10,epochs=50)
-score = model.evaluate(valid_feature,valid_label)
-print('Total loss on testing set : ',score[0])
-print('accuracy of testing set : ',score[1])
-print('done')
-
 
