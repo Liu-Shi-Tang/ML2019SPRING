@@ -39,11 +39,29 @@ def parsingTrainingData(file_name) :
   feature = feature.astype(float)
   feature = feature/255
   
+  valid_feature = []
+  valid_label = []
+  train_feature = []
+  train_label = []
+  for i in range(len(feature)) :
+    if i % 15 == 0 :
+      valid_feature.append(feature[i])
+      valid_label.append(label[i]) 
+    else :
+      train_feature.append(feature[i])
+      train_label.append(label[i])
+
+  valid_feature = np.array(valid_feature)
+  valid_label = np.array(valid_label)
+  train_feature = np.array(train_feature)
+  train_label = np.array(train_label)
+
+
   # split data
-  valid_feature = feature[:2000]
-  valid_label = label[:2000]
-  train_feature = feature[2000:]
-  train_label = label[2000:]
+#  valid_feature = feature[:2000]
+#  valid_label = label[:2000]
+#  train_feature = feature[2000:]
+#  train_label = label[2000:]
   return train_feature,train_label,valid_feature,valid_label
 
 
